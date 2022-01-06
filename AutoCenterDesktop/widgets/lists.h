@@ -36,6 +36,10 @@ private slots:
     void on_radio_org_clicked();
     void on_radio_not_org_clicked();
 
+    void on_tableView_doubleClicked(const QModelIndex &index);
+
+    void on_btn_load_clicked();
+
 signals:
     void tabRecordsRequested(int list_id);
 

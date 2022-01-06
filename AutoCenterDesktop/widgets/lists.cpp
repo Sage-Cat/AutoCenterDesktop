@@ -153,3 +153,14 @@ void Lists::on_radio_not_org_clicked()
     setModelFilter(FilterFlag::ShowCustomersOnly);
 }
 
+void Lists::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    const int list_id = index.siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toInt();
+    emit tabRecordsRequested(list_id);
+}
+
+void Lists::on_btn_load_clicked()
+{
+
+}
+
