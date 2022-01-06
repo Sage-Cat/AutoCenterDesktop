@@ -11,7 +11,7 @@ const QStringList docTypes {
     "Накладні на повернення",
     "Накладна на надходження"
 };
-const int receiptDocumentId = 5;
+const int RECEIPT_DOCUMENT_NAME_ID = 5;
 
 
 #endif // GLOBAL_H

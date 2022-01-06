@@ -4,7 +4,10 @@
 #include <QSqlTableModel>
 #include <QSqlQuery>
 
+#include <QMessageBox>
+
 #include "mainwindow.h"
+#include "dialogs/setlisttype.h"
 
 #include "global.h"
 
@@ -20,7 +23,7 @@ void Lists::setModelFilter(FilterFlag flag)
     QString filter {
         isSale ? "type <> " : "type == "
     };
-    filter += "'" + docTypes.at(receiptDocumentId) + "'";
+    filter += "'" + docTypes.at(RECEIPT_DOCUMENT_NAME_ID) + "'";
 
     // #2 Check for combobox filters
     if (flag == FilterFlag::ShowOrganizationsOnly)
@@ -69,16 +72,57 @@ Lists::~Lists()
 void Lists::on_btn_add_clicked()
 {
     QSqlQuery qry;
-    // Get MAX+1 id to insert new row
-    qry.exec("SELECT MAX(ID) FROM list");
-    qry.next();
-    const int next_id = qry.value(0).toInt() + 1;
+    // #1 Get MAX+1 id to insert new row
+    qry.exec("SELECT MAX(id) FROM list");
+    int next_id {};
+    if (!qry.next())
+    {
+        QMessageBox::warning(this,
+                             "Попередження",
+                             "Не вдалося знайти жодного запису у базі даних. Почато рахунок з початку",
+                             QMessageBox::Ok
+                             );
+    }
+    else
+    {
+        next_id = qry.value(0).toInt() + 1;
+    }
 
-    // #1 Add new empty list to db + refresh
-    qry.exec("INSERT INTO list(ID) VALUES(" + QString::number(next_id) + ")");
+
+    // #2 Get list type from user and count it's number
+    QString listType = docTypes.at(RECEIPT_DOCUMENT_NAME_ID);
+    if (isSale)
+    {
+        SetListType *dlg = new SetListType;
+        if (dlg->exec() != QDialog::Accepted)
+            return;
+        listType = dlg->getSelectedType();
+    }
+
+    qry.exec("SELECT MAX(number) FROM list WHERE type == '" + listType + "'");
+    int newNumber {};
+    if (!qry.next())
+    {
+        QMessageBox::warning(this,
+                             "Попередження",
+                             "Не вдалося знайти жодного списку типу " + listType +  " у базі даних. Почато рахунок з початку",
+                             QMessageBox::Ok
+                             );
+    }
+    else
+    {
+        newNumber = qry.value(0).toInt() + 1;
+    }
+
+    // #3 Add new empty list to db + refresh
+    qry.exec("INSERT INTO list(id, number, type) VALUES(" +
+             QString::number(next_id) + ", " +
+             QString::number(newNumber) + ", '" +
+             listType +
+             "')");
     model->select();
 
-    // #2 Open new tab for created list
+    // #4 Open new tab for created list
     emit tabRecordsRequested(next_id);
 }
 
