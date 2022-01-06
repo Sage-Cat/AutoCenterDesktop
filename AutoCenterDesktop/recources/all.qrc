@@ -14,5 +14,6 @@
         <file>icons/sale.png</file>
         <file>icons/seller.png</file>
         <file>icons/work.png</file>
+        <file>db_init.sql</file>
     </qresource>
 </RCC>

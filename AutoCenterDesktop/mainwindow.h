@@ -15,6 +15,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void closeTab(int index);
+    void on_act_sales_triggered();
+
+    void openTabLists(bool isSale, QString label);
+
 private:
     Ui::MainWindow *ui;
 };

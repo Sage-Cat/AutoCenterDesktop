@@ -459,7 +459,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>AutoCenter</string>
+   <string>AutoCenterDesktop</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow::separator {
@@ -1004,11 +1004,6 @@ QTabWidget::tab-bar {
    <addaction name="menu_management"/>
    <addaction name="menu_analytics"/>
   </widget>
-  <action name="act_allSales">
-   <property name="text">
-    <string>Усі реалізації</string>
-   </property>
-  </action>
   <action name="act_sales">
    <property name="text">
     <string>Реалізації</string>
