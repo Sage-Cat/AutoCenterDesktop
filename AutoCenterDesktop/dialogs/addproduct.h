@@ -3,8 +3,6 @@
 
 #include <QDialog>
 
-#include "networkcommunication.h"
-
 namespace Ui {
 class AddProduct;
 }

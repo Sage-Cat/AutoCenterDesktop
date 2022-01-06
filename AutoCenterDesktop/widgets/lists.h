@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class QSqlTableModel;
+
 namespace Ui {
 class Lists;
 }
@@ -10,6 +12,8 @@ class Lists;
 class Lists : public QWidget
 {
     Q_OBJECT
+
+    const int ID_COLUMN_INDEX{ 0 };
 
 public:
     explicit Lists(QWidget *parent = nullptr, bool isSale = true);
@@ -23,9 +27,13 @@ private slots:
     void on_radio_org_clicked();
     void on_radio_not_org_clicked();
 
+signals:
+    void tabRecordsRequested(int list_id);
+
 private:
     Ui::Lists *ui;
     bool isSale;
+    QSqlTableModel *model;
 };
 
 #endif // LISTS_H

@@ -20,6 +20,7 @@ private slots:
     void on_act_sales_triggered();
 
     void openTabLists(bool isSale, QString label);
+    void openTabRecords(int list_id);
 
 private:
     Ui::MainWindow *ui;

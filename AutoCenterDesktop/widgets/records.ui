@@ -205,7 +205,7 @@ margin-right: 5px;</string>
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../recources/recources.qrc">
+        <iconset resource="../recources/all.qrc">
          <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
        </property>
        <property name="shortcut">
@@ -234,37 +234,11 @@ margin-right: 5px;</string>
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../recources/recources.qrc">
+        <iconset resource="../recources/all.qrc">
          <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
        </property>
        <property name="shortcut">
         <string>Del</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_refresh">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>35</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../recources/recources.qrc">
-         <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
-       </property>
-       <property name="shortcut">
-        <string>Ctrl+A</string>
        </property>
       </widget>
      </item>
@@ -450,7 +424,7 @@ margin-left: 10px;</string>
   </layout>
  </widget>
  <resources>
-  <include location="../recources/recources.qrc"/>
+  <include location="../recources/all.qrc"/>
  </resources>
  <connections/>
 </ui>

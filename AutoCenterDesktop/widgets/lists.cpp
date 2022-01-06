@@ -2,6 +2,7 @@
 #include "ui_lists.h"
 
 #include <QSqlTableModel>
+#include <QSqlQuery>
 
 #include "mainwindow.h"
 
@@ -13,7 +14,7 @@ Lists::Lists(QWidget *parent, bool isSale) :
     ui->setupUi(this);
 
     // model for tableView
-    QSqlTableModel *model = new QSqlTableModel();
+    model = new QSqlTableModel();
     model->setTable("list_view");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->select();
@@ -25,7 +26,8 @@ Lists::Lists(QWidget *parent, bool isSale) :
     model->setHeaderData(5, Qt::Horizontal, tr("Продавець"));
 
     ui->tableView->setModel(model);
-    ui->tableView->setColumnHidden(0, true); // hide ID column
+    ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID column
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 Lists::~Lists()
@@ -35,6 +37,19 @@ Lists::~Lists()
 
 void Lists::on_btn_add_clicked()
 {
+    QSqlQuery qry;
+    // Get MAX+1 id to insert new row
+    qry.exec("SELECT MAX(ID) FROM list");
+    qry.next();
+    int next_id = qry.value(0).toInt() + 1;
+
+    // #1 Add new empty list to db + refresh
+    qry.exec("INSERT INTO list(ID) VALUES(" + QString::number(next_id) + ")");
+    model->select();
+    ui->tableView->update();
+
+    // #2 Open new tab for created list
+    emit tabRecordsRequested(next_id);
 }
 
 void Lists::on_btn_del_clicked()

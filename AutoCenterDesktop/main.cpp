@@ -8,6 +8,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+bool initDB(QMainWindow *parent, QSqlDatabase *db);
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -17,7 +19,7 @@ int main(int argc, char *argv[])
     QSqlDatabase db;
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("database.db");
-    if (!db.open())
+    if (!(db.open() && initDB(&w, &db)))
         QMessageBox::critical(&w, "Помилка", "Не вийшло відкрити базу даних", QMessageBox::Ok);
 
     w.show();
@@ -28,10 +30,12 @@ bool initDB(QMainWindow *parent, QSqlDatabase *db)
 {
     bool success{ true };
 
-
     QFile file(":/db_init.sql");
     if (!file.open(QIODevice::ReadOnly))
+    {
         QMessageBox::critical(parent, "Помилка", "Не вийшло ініціалізувати базу даних", QMessageBox::Ok);
+        success = false;
+    }
 
     // Parsing the db_init.sql file and executing queries
     QSqlQuery qry(*db);
