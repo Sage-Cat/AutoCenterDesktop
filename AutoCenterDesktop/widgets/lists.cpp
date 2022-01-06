@@ -41,12 +41,11 @@ void Lists::on_btn_add_clicked()
     // Get MAX+1 id to insert new row
     qry.exec("SELECT MAX(ID) FROM list");
     qry.next();
-    int next_id = qry.value(0).toInt() + 1;
+    const int next_id = qry.value(0).toInt() + 1;
 
     // #1 Add new empty list to db + refresh
     qry.exec("INSERT INTO list(ID) VALUES(" + QString::number(next_id) + ")");
     model->select();
-    ui->tableView->update();
 
     // #2 Open new tab for created list
     emit tabRecordsRequested(next_id);
@@ -54,6 +53,14 @@ void Lists::on_btn_add_clicked()
 
 void Lists::on_btn_del_clicked()
 {
+    const auto selectedRows = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
+    if (!selectedRows.isEmpty())
+    {
+        const QString id = selectedRows.front().data(Qt::DisplayRole).toString();
+        QSqlQuery qry;
+        qry.exec("DELETE FROM list WHERE id=" + id);
+        model->select();
+    }
 }
 
 void Lists::on_radio_all_clicked()

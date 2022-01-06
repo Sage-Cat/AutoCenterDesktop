@@ -25,7 +25,6 @@ private slots:
     /* BUTTONS */
     void on_btn_add_clicked();
     void on_btn_del_clicked();
-    void on_btn_refresh_clicked();
 
     /* ACTION */
     void on_tableWidget_itemChanged(QTableWidgetItem *item);

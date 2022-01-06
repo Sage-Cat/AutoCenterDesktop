@@ -32,10 +32,6 @@ void Records::on_btn_del_clicked()
 {
 }
 
-void Records::on_btn_refresh_clicked()
-{
-}
-
 void Records::on_tableWidget_itemChanged(QTableWidgetItem *item)
 {
 }
