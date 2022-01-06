@@ -15,6 +15,7 @@ SOURCES += \
     widgets/records.cpp
 
 HEADERS += \
+    global.h \
     mainwindow.h \
     widgets/lists.h \
     widgets/records.h

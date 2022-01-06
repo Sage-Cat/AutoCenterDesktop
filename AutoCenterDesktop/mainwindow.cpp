@@ -59,3 +59,9 @@ void MainWindow::openTabRecords(int list_id)
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+
+void MainWindow::on_act_receipts_triggered()
+{
+    openTabLists(false, "Надходження");
+}
+

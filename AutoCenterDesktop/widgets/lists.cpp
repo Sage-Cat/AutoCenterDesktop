@@ -6,6 +6,33 @@
 
 #include "mainwindow.h"
 
+#include "global.h"
+
+
+/*!
+ * \brief Lists::setModelFilter sets complex filter system. We need it due to number of characteristics
+ * like isSale and comboboxes
+ * \param filterState
+ */
+void Lists::setModelFilter(FilterFlag flag)
+{
+    // #1 Check for isSale
+    QString filter {
+        isSale ? "type <> " : "type == "
+    };
+    filter += "'" + docTypes.at(receiptDocumentId) + "'";
+
+    // #2 Check for combobox filters
+    if (flag == FilterFlag::ShowOrganizationsOnly)
+        filter += " AND ipn IS NOT NULL";
+    else if (flag == FilterFlag::ShowCustomersOnly)
+        filter += " AND ipn IS NULL";
+
+    model->setFilter(filter);
+    model->select();
+    ui->tableView->update();
+}
+
 Lists::Lists(QWidget *parent, bool isSale) :
     QWidget(parent),
     ui(new Ui::Lists),
@@ -19,15 +46,19 @@ Lists::Lists(QWidget *parent, bool isSale) :
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Коли"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Номер"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Тип"));
-    model->setHeaderData(4, Qt::Horizontal, tr("Покупець"));
-    model->setHeaderData(5, Qt::Horizontal, tr("Продавець"));
+    model->setHeaderData(1, Qt::Horizontal, tr("ІПН")); // only organizations will have ipn
+    model->setHeaderData(2, Qt::Horizontal, tr("Коли"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Номер"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Тип"));
+    model->setHeaderData(5, Qt::Horizontal, tr("Покупець"));
+    model->setHeaderData(6, Qt::Horizontal, tr("Продавець"));
 
     ui->tableView->setModel(model);
-    ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID column
+    ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
+    ui->tableView->setColumnHidden(IPN_COLUMN_INDEX, true); // hide IPN
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    setModelFilter(FilterFlag::ShowAll);
 }
 
 Lists::~Lists()
@@ -65,13 +96,16 @@ void Lists::on_btn_del_clicked()
 
 void Lists::on_radio_all_clicked()
 {
+    setModelFilter(FilterFlag::ShowAll);
 }
 
 void Lists::on_radio_org_clicked()
 {
+    setModelFilter(FilterFlag::ShowOrganizationsOnly);
 }
 
 void Lists::on_radio_not_org_clicked()
 {
+    setModelFilter(FilterFlag::ShowCustomersOnly);
 }
 

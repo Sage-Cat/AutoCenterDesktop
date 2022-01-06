@@ -14,6 +14,15 @@ class Lists : public QWidget
     Q_OBJECT
 
     const int ID_COLUMN_INDEX{ 0 };
+    const int IPN_COLUMN_INDEX{ 1 };
+
+    enum class FilterFlag{
+        ShowAll,
+        ShowOrganizationsOnly,
+        ShowCustomersOnly
+    };
+
+    void setModelFilter(FilterFlag flag);
 
 public:
     explicit Lists(QWidget *parent = nullptr, bool isSale = true);
