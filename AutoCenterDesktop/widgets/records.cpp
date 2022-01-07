@@ -66,10 +66,19 @@ void Records::on_comboBox_Seller_currentIndexChanged(int index)
 
 void Records::on_btn_add_clicked()
 {
+    QSqlQuery qry;
+    qry.exec("INSERT INTO record(list_id) VALUES(" + QString::number(list_id) + ")");
+
+    updateView();
 }
 
 void Records::on_btn_del_clicked()
 {
+    const QModelIndex record_id = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX).at(0);
+    QSqlQuery qry;
+    qry.exec("DELETE FROM record WHERE id=" + record_id.data(Qt::DisplayRole).toString());
+
+    updateView();
 }
 
 void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
