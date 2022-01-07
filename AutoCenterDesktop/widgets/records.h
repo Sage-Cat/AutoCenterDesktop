@@ -37,8 +37,10 @@ private slots:
     void on_btn_print_barcode_clicked();
     void on_btn_print_document_clicked();
 
-    /* UPDATE */
+    /* UPDATE&INIT */
     void updateView();
+    void initDateTime();
+    void initComboboxes();
 
 private:
     Ui::Records* ui;

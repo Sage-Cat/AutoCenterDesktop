@@ -35,6 +35,12 @@ Records::Records(QWidget *parent, int list_id) :
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->setColumnHidden(LIST_ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // Comboboxes
+    initComboboxes();
+
+    // Datetime
+    initDateTime();
 }
 
 Records::~Records()
@@ -84,5 +90,35 @@ void Records::updateView()
     if (qry.next())
         sum = qry.value(0).toFloat();
     ui->line_sum->setText(QString::number(sum));
+}
+
+void Records::initDateTime()
+{
+    QSqlQuery qry;
+    qry.exec("SELECT datetime FROM list WHERE id=" + QString::number(list_id));
+    QString datetime {};
+    if (qry.next())
+        datetime = qry.value(0).toString();
+    ui->line_datetime->setText(datetime);
+}
+
+void Records::initComboboxes()
+{
+    // Customers
+    QSqlQuery qry;
+    qry.exec("SELECT id, name FROM customer");
+    while (qry.next())
+        ui->comboBox_Customer->insertItem(
+                    qry.value(0).toInt(),
+                    qry.value(1).toString()
+                    );
+
+    // Sellers
+    qry.exec("SELECT id, name FROM seller");
+    while (qry.next())
+        ui->comboBox_Seller->insertItem(
+                    qry.value(0).toInt(),
+                    qry.value(1).toString()
+                    );
 }
 
