@@ -2,7 +2,7 @@
 #define _H
 
 #include <QTableWidgetItem>
-#include <QVector>
+#include <QMap>
 #include <QWidget>
 
 class QSqlTableModel;
@@ -31,7 +31,6 @@ private slots:
     void on_btn_del_clicked();
 
     /* ACTION */
-    void on_tableWidget_itemChanged(QTableWidgetItem* item);
 
     /* PRINT */
     void on_btn_print_barcode_clicked();
@@ -42,10 +41,14 @@ private slots:
     void initDateTime();
     void initComboboxes();
 
+    /* CUSTOM */
+    QString getFromDBCurrentListColumn(QString column_name);
+
 private:
     Ui::Records* ui;
     int list_id;
     QSqlTableModel* model;
+    QMap<int, QString> customer_index_to_id, seller_index_to_id;
 };
 
 #endif // _H

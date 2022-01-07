@@ -33,7 +33,6 @@ void Lists::setModelFilter(FilterFlag flag)
 
     model->setFilter(filter);
     model->select();
-    ui->tableView->update();
 }
 
 Lists::Lists(QWidget *parent, bool isSale) :
@@ -162,5 +161,11 @@ void Lists::on_tableView_doubleClicked(const QModelIndex &index)
 void Lists::on_btn_load_clicked()
 {
 
+}
+
+
+void Lists::on_btn_refresh_clicked()
+{
+    model->select();
 }
 

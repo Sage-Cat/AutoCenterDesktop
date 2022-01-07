@@ -40,6 +40,8 @@ private slots:
 
     void on_btn_load_clicked();
 
+    void on_btn_refresh_clicked();
+
 signals:
     void tabRecordsRequested(int list_id);
 
