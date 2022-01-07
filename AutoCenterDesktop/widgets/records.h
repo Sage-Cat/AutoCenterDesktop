@@ -31,6 +31,9 @@ private slots:
     void on_btn_del_clicked();
 
     /* ACTION */
+    void handleDataChange(const QModelIndex& topLeft, const QModelIndex&);
+    void handleProductCodeChange(const QString &data, const QString &record_id);
+    void handleSimpleCellChange(const QString& columnName, const QString &data, const QString &record_id);
 
     /* PRINT */
     void on_btn_print_barcode_clicked();

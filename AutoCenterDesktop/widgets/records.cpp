@@ -4,6 +4,8 @@
 #include <QSqlQuery>
 #include <QSqlTableModel>
 
+#include <QVector>
+
 #include <QMessageBox>
 
 Records::Records(QWidget* parent, int list_id)
@@ -41,6 +43,8 @@ Records::Records(QWidget* parent, int list_id)
 
     // Datetime
     initDateTime();
+
+    connect(model, &QSqlTableModel::dataChanged, this, &Records::handleDataChange);
 }
 
 Records::~Records()
@@ -66,6 +70,51 @@ void Records::on_btn_add_clicked()
 
 void Records::on_btn_del_clicked()
 {
+}
+
+void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
+{
+    const QVector<int> editableColumns = {
+        2 /* code */, 6 /* price */, 7 /* count */
+    };
+    const int column = topLeft.column();
+    const QString data = topLeft.data(Qt::DisplayRole).toString();
+    const QString record_id = topLeft.siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toString();
+
+    if (editableColumns.contains(column)) {
+        switch (column) {
+        case 2: {
+            handleProductCodeChange(data, record_id);
+        } break;
+        case 6: {
+            handleSimpleCellChange("price", data, record_id);
+        } break;
+        case 7: {
+            handleSimpleCellChange("count", data, record_id);
+        } break;
+        }
+    }
+
+    updateView();
+}
+
+void Records::handleProductCodeChange(const QString& data, const QString& record_id)
+{
+    // #1 Find product_id by code
+    QSqlQuery qry;
+    qry.exec("SELECT id FROM product WHERE code='" + data + "'");
+    if (qry.next())
+        // #2 Change product_id cell
+        handleSimpleCellChange("product_id", qry.value(0).toString(), record_id);
+    else
+        QMessageBox::information(this, "Повідомляю", "Товару з даним кодом у базі данних не знайдено", QMessageBox::Ok);
+}
+
+void Records::handleSimpleCellChange(const QString& columnName, const QString& data, const QString& record_id)
+{
+    QSqlQuery qry;
+    const QString query_str = "UPDATE record SET %1=%2 WHERE id=%3";
+    qry.exec(query_str.arg(columnName, data, record_id));
 }
 
 void Records::on_btn_print_barcode_clicked()
