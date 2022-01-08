@@ -5,6 +5,7 @@
 #include "widgets/records.h"
 #include "widgets/customers.h"
 #include "widgets/sellers.h"
+#include "widgets/info.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -65,6 +66,12 @@ void MainWindow::openTabRecords(int list_id)
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+void MainWindow::openTabInfo(int id)
+{
+    Info *tab = new Info(this, id);
+    ui->tabWidget->addTab(tab, QIcon(":/icons/info.png"), "Інформація");
+    ui->tabWidget->setCurrentWidget(tab);
+}
 
 void MainWindow::on_act_receipts_triggered()
 {
@@ -75,7 +82,7 @@ void MainWindow::on_act_receipts_triggered()
 void MainWindow::on_act_customers_triggered()
 {
     Customers *tab = new Customers(this);
-    // TODO: connet to method for info widget opening
+    connect(tab, &Customers::tabCustomerInfoRequested, this, &MainWindow::openTabInfo);
 
     ui->tabWidget->addTab(tab, QIcon(":/icons/customer.png"), "Клієнти");
     ui->tabWidget->setCurrentWidget(tab);

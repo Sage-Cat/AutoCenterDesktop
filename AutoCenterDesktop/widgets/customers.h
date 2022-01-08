@@ -24,7 +24,6 @@ private slots:
     void on_btn_del_clicked();
     void on_btn_info_clicked();
     void on_btn_cars_clicked();
-    void on_tableView_doubleClicked(const QModelIndex &index);
 
     void handleDataChange(const QModelIndex& topLeft, const QModelIndex&);
     void handleSimpleCellChange(const QString& columnName, const QString &data, const QString &customer_id);

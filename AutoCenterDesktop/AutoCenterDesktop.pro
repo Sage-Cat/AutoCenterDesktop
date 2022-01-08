@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     widgets/customers.cpp \
+    widgets/info.cpp \
     widgets/lists.cpp \
     widgets/records.cpp \
     widgets/sellers.cpp
@@ -22,6 +23,7 @@ HEADERS += \
     global.h \
     mainwindow.h \
     widgets/customers.h \
+    widgets/info.h \
     widgets/lists.h \
     widgets/records.h \
     widgets/sellers.h
@@ -30,6 +32,7 @@ FORMS += \
     dialogs/setlisttype.ui \
     mainwindow.ui \
     widgets/customers.ui \
+    widgets/info.ui \
     widgets/lists.ui \
     widgets/records.ui \
     widgets/sellers.ui

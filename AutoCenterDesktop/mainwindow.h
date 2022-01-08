@@ -22,6 +22,7 @@ private slots:
 
     void openTabLists(bool isSale, QString label);
     void openTabRecords(int list_id);
+    void openTabInfo(int id);
 
     void on_act_receipts_triggered();
     void on_act_customers_triggered();

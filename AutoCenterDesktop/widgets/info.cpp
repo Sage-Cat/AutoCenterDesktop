@@ -1,54 +1,35 @@
 #include "info.h"
 #include "ui_info.h"
 
-Info::Info(QWidget *parent, NetworkCommunication *networkCommunication, Tables table, int ID) :
+#include <QSqlTableModel>
+
+Info::Info(QWidget *parent, int id) :
     QWidget(parent),
     ui(new Ui::Info),
-    networkCommunication(networkCommunication),
-    table(table),
-    ID(ID)
+    id(id)
 {
     ui->setupUi(this);
 
-    // SELECT * FROM table WHERE ID=ID
-    QStringList requestList = {
-        SERVER_API[Api::_get],
-        DATABASE_TABLES[table],
-        "ID=" + QString::number(ID)
-    };
+    // model for tableView
+    model = new QSqlTableModel();
+    model->setTable("info_customer");
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    model->setFilter("id=" + QString::number(id));
+    model->select();
+    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, tr("Коли"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Код"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Каталог"));
+    model->setHeaderData(4, Qt::Horizontal, tr("ТНВЕД"));
+    model->setHeaderData(5, Qt::Horizontal, tr("Назва"));
+    model->setHeaderData(6, Qt::Horizontal, tr("Ціна"));
+    model->setHeaderData(7, Qt::Horizontal, tr("К-сть"));
+    model->setHeaderData(8, Qt::Horizontal, tr("Одиниці"));
+    model->setHeaderData(9, Qt::Horizontal, tr("Сума"));
 
-    emit networkCommunication->requestReady(requestList.join(DELIMITERS[Delimiters::primary]));
-
-    // GET RESPONSE (parsing it to the list of records)
-    RecordsList recordsList;
-    for(const auto &record : networkCommunication->getResponseWhenReady().split(DELIMITERS[Delimiters::primary]))
-        recordsList.push_back(record.split(DELIMITERS[Delimiters::secondary]));
-
-    /* COLUMNS */
-    int column_count = COLUMN_NAMES[table].size();
-
-    ui->tableWidget->setColumnCount(column_count);
-    ui->tableWidget->setHorizontalHeaderLabels(COLUMN_NAMES[table]);
-
-    // hide ID (last column)
-    ui->tableWidget->setColumnHidden(column_count - 1, true);
-
-    /* ROWS */
-    if(recordsList.size() < 1)
-        return;
-
-    if(recordsList.at(0).at(0) == "")
-    {
-        ui->tableWidget->setRowCount(0);
-        return;
-    }
-
-    // setting up the data
-    int row_count = recordsList.size();
-    ui->tableWidget->setRowCount(row_count);
-    for(int row = 0; row < row_count; ++row)
-        for(int col = 0; col < column_count; ++col)
-            ui->tableWidget->setItem(row, col, new QTableWidgetItem(recordsList[row][col]));
+    ui->tableView->setModel(model);
+    ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 Info::~Info()

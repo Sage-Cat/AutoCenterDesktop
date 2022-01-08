@@ -3,28 +3,25 @@
 
 #include <QWidget>
 
-#include "networkcommunication.h"
+class QSqlTableModel;
 
 namespace Ui {
 class Info;
 }
 
-class Info : public QWidget
-{
+class Info : public QWidget {
     Q_OBJECT
 
+    const int ID_COLUMN_INDEX{ 0 };
+
 public:
-    explicit Info(QWidget *parent = nullptr,
-                  NetworkCommunication *networkCommunication = new NetworkCommunication(new TcpClient),
-                  Tables table = Tables::info_customer,
-                  int ID = 0);
+    explicit Info(QWidget* parent = nullptr, int id = 0);
     ~Info();
 
 private:
-    Ui::Info *ui;
-    NetworkCommunication *networkCommunication;
-    Tables table;
-    int ID;
+    Ui::Info* ui;
+    int id {};
+    QSqlTableModel *model;
 };
 
 #endif // INFO_H

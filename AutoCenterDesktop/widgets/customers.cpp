@@ -63,19 +63,15 @@ void Customers::on_btn_del_clicked()
 
 void Customers::on_btn_info_clicked()
 {
-    const auto selected_rows = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
-    if (!selected_rows.isEmpty())
-        emit tabCustomerInfoRequested(selected_rows.at(0).data(Qt::DisplayRole).toInt());
+    const auto selected_indexes = ui->tableView->selectionModel()->selectedIndexes();
+    if (!selected_indexes.isEmpty())
+        emit tabCustomerInfoRequested(selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+                                      .data(Qt::DisplayRole).toInt());
 }
 
 void Customers::on_btn_cars_clicked()
 {
 
-}
-
-void Customers::on_tableView_doubleClicked(const QModelIndex &index)
-{
-    emit tabCustomerInfoRequested(index.siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toInt());
 }
 
 void Customers::handleDataChange(const QModelIndex &topLeft, const QModelIndex &)
