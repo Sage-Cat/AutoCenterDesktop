@@ -162,7 +162,6 @@ void Lists::on_btn_load_clicked()
 
 }
 
-
 void Lists::updateView()
 {
     model->select();
