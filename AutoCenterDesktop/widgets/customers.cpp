@@ -71,7 +71,10 @@ void Customers::on_btn_info_clicked()
 
 void Customers::on_btn_cars_clicked()
 {
-
+    const auto selected_indexes = ui->tableView->selectionModel()->selectedIndexes();
+    if (!selected_indexes.isEmpty())
+        emit tabCarsRequested(selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+                                      .data(Qt::DisplayRole).toInt());
 }
 
 void Customers::handleDataChange(const QModelIndex &topLeft, const QModelIndex &)

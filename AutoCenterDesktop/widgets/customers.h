@@ -33,6 +33,7 @@ public slots:
 
 signals:
     void tabCustomerInfoRequested(int customer_id);
+    void tabCarsRequested(int customer_id);
 
 private:
     Ui::Customers *ui;

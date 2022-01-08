@@ -6,6 +6,7 @@
 #include "widgets/customers.h"
 #include "widgets/sellers.h"
 #include "widgets/info.h"
+#include "widgets/cars.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -73,21 +74,31 @@ void MainWindow::openTabInfo(int id)
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+void MainWindow::openTabCars(int customer_id)
+{
+    Cars *tab = new Cars(this, customer_id);
+    Customers *sender_tab = qobject_cast<Customers *>(sender());
+    if (sender_tab)
+        connect(tab, &Cars::carsCountChanged, sender_tab, &Customers::updateView);
+
+    ui->tabWidget->addTab(tab, QIcon(":/icons/info.png"), "Інформація");
+    ui->tabWidget->setCurrentWidget(tab);
+}
+
 void MainWindow::on_act_receipts_triggered()
 {
     openTabLists(false, "Надходження");
 }
 
-
 void MainWindow::on_act_customers_triggered()
 {
     Customers *tab = new Customers(this);
     connect(tab, &Customers::tabCustomerInfoRequested, this, &MainWindow::openTabInfo);
+    connect(tab, &Customers::tabCarsRequested, this, &MainWindow::openTabCars);
 
     ui->tabWidget->addTab(tab, QIcon(":/icons/customer.png"), "Клієнти");
     ui->tabWidget->setCurrentWidget(tab);
 }
-
 
 void MainWindow::on_act_sellers_triggered()
 {

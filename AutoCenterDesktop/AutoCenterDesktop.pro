@@ -12,6 +12,7 @@ SOURCES += \
     dialogs/setlisttype.cpp \
     main.cpp \
     mainwindow.cpp \
+    widgets/cars.cpp \
     widgets/customers.cpp \
     widgets/info.cpp \
     widgets/lists.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     dialogs/setlisttype.h \
     global.h \
     mainwindow.h \
+    widgets/cars.h \
     widgets/customers.h \
     widgets/info.h \
     widgets/lists.h \
@@ -31,6 +33,7 @@ HEADERS += \
 FORMS += \
     dialogs/setlisttype.ui \
     mainwindow.ui \
+    widgets/cars.ui \
     widgets/customers.ui \
     widgets/info.ui \
     widgets/lists.ui \
