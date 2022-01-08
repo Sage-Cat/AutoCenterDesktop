@@ -88,29 +88,8 @@ void Lists::on_btn_add_clicked()
     }
 
     // #2 Get list type from user and count it's number
-    QString listType = docTypes.at(RECEIPT_DOCUMENT_NAME_ID);
-    if (isSale)
-    {
-        SetListType *dlg = new SetListType;
-        if (dlg->exec() != QDialog::Accepted)
-            return;
-        listType = dlg->getSelectedType();
-    }
-
-    qry.exec("SELECT MAX(number) FROM list WHERE type == '" + listType + "'");
-    int newNumber {};
-    if (!qry.next())
-    {
-        QMessageBox::warning(this,
-                             "Попередження",
-                             "Не вдалося знайти жодного списку типу " + listType +  " у базі даних. Почато рахунок з початку",
-                             QMessageBox::Ok
-                             );
-    }
-    else
-    {
-        newNumber = qry.value(0).toInt() + 1;
-    }
+    QString listType = askListType();
+    int newNumber = getNewListNumber(listType);
 
     // #3 Add new empty list to db + refresh
     qry.exec("INSERT INTO list(id, number, type) VALUES(" +
@@ -131,6 +110,7 @@ void Lists::on_btn_del_clicked()
     {
         const QString id = selectedRows.front().data(Qt::DisplayRole).toString();
         QSqlQuery qry;
+        qry.exec("PRAGMA foreign_keys=ON");
         qry.exec("DELETE FROM list WHERE id=" + id);
         model->select();
     }
@@ -165,5 +145,73 @@ void Lists::on_btn_load_clicked()
 void Lists::updateView()
 {
     model->select();
+}
+
+void Lists::on_btn_create_clicked()
+{
+    const auto selectedRow = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
+    if (!selectedRow.isEmpty())
+    {
+        const int list_id = selectedRow.at(0).data(Qt::DisplayRole).toInt();
+        QSqlQuery qry;
+
+        // #1 Create new list with the same params and different type&number (if is needed)
+        QString listType = askListType();
+        int newNumber = getNewListNumber(listType);
+
+        QString query_str =
+                "INSERT INTO list(number, type, customer_id, seller_id) "
+                    "SELECT %1, %2, customer_id, seller_id FROM list WHERE ID=%3";
+        qry.exec(query_str.arg(QString::number(newNumber), listType, QString::number(list_id)));
+
+        // #2 Get created list's id
+        qry.exec("SELECT MAX(id) FROM list");
+        if (qry.next())
+        {
+            const QString created_list_id = qry.value(0).toString();
+
+            // #3 Copy all records to new list
+            query_str =
+                    "INSERT INTO record(count, price, product_id, list_id) "
+                        "SELECT count, price, product_id, %1 FROM record WHERE list_id=%2";
+            qry.exec(query_str.arg(created_list_id, QString::number(list_id)));
+
+            emit tabRecordsRequested(list_id);
+        }
+    }
+}
+
+QString Lists::askListType()
+{
+    QString listType = docTypes.at(RECEIPT_DOCUMENT_NAME_ID);
+    if (isSale)
+    {
+        SetListType *dlg = new SetListType;
+        if (dlg->exec() != QDialog::Accepted)
+            return "NULL";
+        listType = dlg->getSelectedType();
+    }
+    return listType;
+}
+
+int Lists::getNewListNumber(const QString &listType)
+{
+    QSqlQuery qry;
+    qry.exec("SELECT MAX(number) FROM list WHERE type == '" + listType + "'");
+    int newNumber {};
+    if (!qry.next())
+    {
+        QMessageBox::warning(this,
+                             "Попередження",
+                             "Не вдалося знайти жодного списку типу " + listType +  " у базі даних. Почато рахунок з початку",
+                             QMessageBox::Ok
+                             );
+    }
+    else
+    {
+        newNumber = qry.value(0).toInt() + 1;
+    }
+
+    return newNumber;
 }
 

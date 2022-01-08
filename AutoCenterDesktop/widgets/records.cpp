@@ -78,9 +78,15 @@ void Records::on_btn_add_clicked()
 
 void Records::on_btn_del_clicked()
 {
-    const QModelIndex record_id = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX).at(0);
+    const auto selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
+    if (selectedIndexes.isEmpty())
+        return;
+    const QString record_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+            .data(Qt::DisplayRole).toString();
+
     QSqlQuery qry;
-    qry.exec("DELETE FROM record WHERE id=" + record_id.data(Qt::DisplayRole).toString());
+    qry.exec("PRAGMA foreign_keys=ON");
+    qry.exec("DELETE FROM record WHERE id=" + record_id);
 
     updateView();
 }

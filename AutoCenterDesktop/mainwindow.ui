@@ -454,8 +454,7 @@
   </property>
   <property name="font">
    <font>
-    <family>Alef</family>
-    <pointsize>14</pointsize>
+    <pointsize>16</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -920,8 +919,8 @@ QMainWindow::separator:hover {
       </property>
       <property name="font">
        <font>
-        <family>Alef</family>
-        <pointsize>12</pointsize>
+        <family>DejaVu Sans</family>
+        <pointsize>16</pointsize>
        </font>
       </property>
       <property name="styleSheet">
@@ -959,16 +958,21 @@ QTabWidget::tab-bar {
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>28</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>Alef</family>
-     <pointsize>14</pointsize>
+     <family>DejaVu Sans</family>
+     <pointsize>16</pointsize>
     </font>
    </property>
    <widget class="QMenu" name="menu_work">
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Робота</string>
     </property>
@@ -976,6 +980,11 @@ QTabWidget::tab-bar {
     <addaction name="act_receipts"/>
    </widget>
    <widget class="QMenu" name="menu_management">
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Менеджмент</string>
     </property>
@@ -986,6 +995,11 @@ QTabWidget::tab-bar {
     <addaction name="act_sellers"/>
    </widget>
    <widget class="QMenu" name="menu_file">
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Файл</string>
     </property>
@@ -994,6 +1008,11 @@ QTabWidget::tab-bar {
     <addaction name="act_exit"/>
    </widget>
    <widget class="QMenu" name="menu_analytics">
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Аналітика</string>
     </property>

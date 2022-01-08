@@ -72,6 +72,32 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_create">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../recources/all.qrc">
+         <normaloff>:/icons/page.png</normaloff>:/icons/page.png</iconset>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+A</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_load">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

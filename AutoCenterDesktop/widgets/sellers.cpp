@@ -43,10 +43,15 @@ void Sellers::on_btn_add_clicked()
 
 void Sellers::on_btn_del_clicked()
 {
-    const auto selected_rows = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
+    const auto selected_indexes = ui->tableView->selectionModel()->selectedIndexes();
     QSqlQuery qry;
-    if (!selected_rows.isEmpty())
-        qry.exec("DELETE FROM seller WHERE id=" + selected_rows.at(0).data(Qt::DisplayRole).toString());
+    if (!selected_indexes.isEmpty())
+    {
+        qry.exec("PRAGMA foreign_keys=ON");
+        qry.exec("DELETE FROM seller WHERE id=" + selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+                 .data(Qt::DisplayRole).toString()
+                 );
+    }
 
     model->select();
 }

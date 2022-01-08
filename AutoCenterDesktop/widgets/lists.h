@@ -36,6 +36,10 @@ private slots:
     void on_radio_not_org_clicked();
     void on_tableView_doubleClicked(const QModelIndex &index);
     void on_btn_load_clicked();
+    void on_btn_create_clicked();
+
+    QString askListType();
+    int getNewListNumber(const QString &listType);
 
 public slots:
     void updateView();

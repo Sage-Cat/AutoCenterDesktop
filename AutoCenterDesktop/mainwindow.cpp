@@ -49,7 +49,7 @@ void MainWindow::openTabLists(bool isSale, QString label)
     connect(tab, &Lists::tabRecordsRequested, this, &MainWindow::openTabRecords);
 
     ui->tabWidget->addTab(tab,
-        isSale ? QIcon(":/icons/sale.png") : QIcon(":/icons/goods.png"),
+        isSale ? QIcon(":/icons/sale.png") : QIcon(":/icons/goods.ico"),
         label);
     ui->tabWidget->setCurrentWidget(tab);
 }
