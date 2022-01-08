@@ -47,6 +47,9 @@ private slots:
     /* CUSTOM */
     QString getFromDBCurrentListColumn(QString column_name);
 
+signals:
+    void listDataChanged();
+
 private:
     Ui::Records* ui;
     int list_id;

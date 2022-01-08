@@ -87,7 +87,6 @@ void Lists::on_btn_add_clicked()
         next_id = qry.value(0).toInt() + 1;
     }
 
-
     // #2 Get list type from user and count it's number
     QString listType = docTypes.at(RECEIPT_DOCUMENT_NAME_ID);
     if (isSale)
@@ -164,7 +163,7 @@ void Lists::on_btn_load_clicked()
 }
 
 
-void Lists::on_btn_refresh_clicked()
+void Lists::updateView()
 {
     model->select();
 }

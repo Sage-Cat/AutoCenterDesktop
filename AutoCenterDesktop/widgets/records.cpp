@@ -56,12 +56,16 @@ void Records::on_comboBox_Customer_currentIndexChanged(int index)
 {
     QSqlQuery qry;
     qry.exec("UPDATE list SET customer_id=" + customer_index_to_id[index] + " WHERE id=" + QString::number(list_id));
+
+    emit listDataChanged();
 }
 
 void Records::on_comboBox_Seller_currentIndexChanged(int index)
 {
     QSqlQuery qry;
     qry.exec("UPDATE list SET seller_id=" + customer_index_to_id[index] + " WHERE id=" + QString::number(list_id));
+
+    emit listDataChanged();
 }
 
 void Records::on_btn_add_clicked()

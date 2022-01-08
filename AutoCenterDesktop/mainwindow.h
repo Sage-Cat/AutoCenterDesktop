@@ -17,12 +17,15 @@ public:
 
 private slots:
     void closeTab(int index);
+
     void on_act_sales_triggered();
 
     void openTabLists(bool isSale, QString label);
     void openTabRecords(int list_id);
 
     void on_act_receipts_triggered();
+    void on_act_customers_triggered();
+    void on_act_sellers_triggered();
 
 private:
     Ui::MainWindow *ui;

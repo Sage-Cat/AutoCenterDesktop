@@ -31,16 +31,14 @@ public:
 private slots:
     void on_btn_add_clicked();
     void on_btn_del_clicked();
-
     void on_radio_all_clicked();
     void on_radio_org_clicked();
     void on_radio_not_org_clicked();
-
     void on_tableView_doubleClicked(const QModelIndex &index);
-
     void on_btn_load_clicked();
 
-    void on_btn_refresh_clicked();
+public slots:
+    void updateView();
 
 signals:
     void tabRecordsRequested(int list_id);

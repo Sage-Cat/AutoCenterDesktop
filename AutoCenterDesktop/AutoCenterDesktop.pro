@@ -12,21 +12,27 @@ SOURCES += \
     dialogs/setlisttype.cpp \
     main.cpp \
     mainwindow.cpp \
+    widgets/customers.cpp \
     widgets/lists.cpp \
-    widgets/records.cpp
+    widgets/records.cpp \
+    widgets/sellers.cpp
 
 HEADERS += \
     dialogs/setlisttype.h \
     global.h \
     mainwindow.h \
+    widgets/customers.h \
     widgets/lists.h \
-    widgets/records.h
+    widgets/records.h \
+    widgets/sellers.h
 
 FORMS += \
     dialogs/setlisttype.ui \
     mainwindow.ui \
+    widgets/customers.ui \
     widgets/lists.ui \
-    widgets/records.ui
+    widgets/records.ui \
+    widgets/sellers.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
