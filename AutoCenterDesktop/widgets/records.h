@@ -5,6 +5,8 @@
 #include <QMap>
 #include <QWidget>
 
+#include <QStyledItemDelegate>
+
 class QSqlTableModel;
 
 namespace Ui {
@@ -16,6 +18,9 @@ class Records : public QWidget {
 
     const int ID_COLUMN_INDEX { 0 };
     const int LIST_ID_COLUMN_INDEX { 1 };
+    const int CODE_COLUMN_INDEX { 2 };
+    const int NAME_COLUMN_INDEX { 5 };
+    const int COUNT_COLUMN_INDEX { 7 };
 
 public:
     explicit Records(QWidget* parent = nullptr, int list_id = 0);
@@ -55,6 +60,28 @@ private:
     int list_id;
     QSqlTableModel* model;
     QMap<int, QString> customer_index_to_id, seller_index_to_id;
+};
+
+/*!
+ * \brief The NumberFormatDelegate special class for preventing tableView's number's convertion to exponential form
+ */
+class NumberFormatDelegate : public QStyledItemDelegate{
+    Q_OBJECT
+    Q_DISABLE_COPY(NumberFormatDelegate)
+public:
+    NumberFormatDelegate(QObject *parent = Q_NULLPTR)
+        :QStyledItemDelegate(parent)
+    {}
+    QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE{
+        switch(value.type()){
+        case QMetaType::Float:
+            return locale.toString(value.toFloat(),'f', 2);
+        case QMetaType::Double:
+            return locale.toString(value.toDouble(),'f', 2);
+        default:
+            return QStyledItemDelegate::displayText(value,locale);
+        }
+    }
 };
 
 #endif // _H

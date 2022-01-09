@@ -1,4 +1,4 @@
-QT += core gui sql
+QT += core gui sql printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +12,9 @@ SOURCES += \
     dialogs/setlisttype.cpp \
     main.cpp \
     mainwindow.cpp \
+    utils/barcodelabelprinter.cpp \
+    utils/code128/code128.cpp \
+    utils/code128/code128item.cpp \
     widgets/cars.cpp \
     widgets/customers.cpp \
     widgets/info.cpp \
@@ -23,6 +26,9 @@ HEADERS += \
     dialogs/setlisttype.h \
     global.h \
     mainwindow.h \
+    utils/barcodelabelprinter.h \
+    utils/code128/code128.h \
+    utils/code128/code128item.h \
     widgets/cars.h \
     widgets/customers.h \
     widgets/info.h \

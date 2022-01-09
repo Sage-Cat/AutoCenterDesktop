@@ -312,8 +312,8 @@ margin-right: 5px;</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>40</width>
-           <height>0</height>
+           <width>100</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -325,10 +325,21 @@ margin-right: 5px;</string>
          <property name="styleSheet">
           <string notr="true">background-color : white; 
 margin-left: 5px; 
-margin-right: 5px;</string>
+margin-right: 5px;
+margin-top:8px;
+margin-bottom:8px;
+padding-top: 3px;
+padding-bottom: 3px;
+padding-left: 3px;
+padding-right: 3px;
+
+</string>
          </property>
          <property name="text">
           <string>дата</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -387,7 +398,7 @@ font: bold 20px;
 margin-left: 10px;</string>
        </property>
        <property name="text">
-        <string>Друкувати етикетку</string>
+        <string>Друкувати етикетки</string>
        </property>
        <property name="shortcut">
         <string>Ctrl+P</string>

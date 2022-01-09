@@ -5,8 +5,10 @@
 #include <QSqlTableModel>
 
 #include <QVector>
-
 #include <QMessageBox>
+
+#include <QPainter>
+#include "utils/barcodelabelprinter.h"
 
 Records::Records(QWidget* parent, int list_id)
     : QWidget(parent)
@@ -37,6 +39,8 @@ Records::Records(QWidget* parent, int list_id)
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->setColumnHidden(LIST_ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->setItemDelegateForColumn(6, new NumberFormatDelegate(this));
+    ui->tableView->setItemDelegateForColumn(9, new NumberFormatDelegate(this));
 
     // Comboboxes
     initComboboxes();
@@ -138,6 +142,22 @@ void Records::handleSimpleCellChange(const QString& columnName, const QString& d
 
 void Records::on_btn_print_barcode_clicked()
 {
+    const auto selectedRows = ui->tableView->selectionModel()->selectedRows(CODE_COLUMN_INDEX);
+    if (!selectedRows.isEmpty())
+    {
+        QVector<BarcodeLabelPrinter::Label> labels;
+        for (const QModelIndex &code : selectedRows)
+        {
+            BarcodeLabelPrinter::Label label;
+            label.barcodeData = code.data(Qt::DisplayRole).toString();
+            label.labelText = code.siblingAtColumn(NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString();
+            label.timesToPrint = code.siblingAtColumn(COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toInt();
+
+            labels.push_back(label);
+        }
+
+        BarcodeLabelPrinter::printLabels(labels);
+    }
 }
 
 void Records::on_btn_print_document_clicked()
@@ -155,7 +175,7 @@ void Records::updateView()
     float sum {};
     if (qry.next())
         sum = qry.value(0).toFloat();
-    ui->line_sum->setText(QString::number(sum));
+    ui->line_sum->setText(QString::number(sum, 'G', 12));
 }
 
 void Records::initDateTime()
