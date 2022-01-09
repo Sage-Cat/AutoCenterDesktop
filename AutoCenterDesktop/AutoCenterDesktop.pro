@@ -1,4 +1,4 @@
-QT += core gui sql printsupport
+QT += core gui sql printsupport widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,40 +9,48 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    dialogs/loadsupplierpricelist.cpp \
     dialogs/setlisttype.cpp \
     main.cpp \
     mainwindow.cpp \
     utils/barcodelabelprinter.cpp \
     utils/code128/code128.cpp \
     utils/code128/code128item.cpp \
+    utils/pricelistparsertodb.cpp \
     widgets/cars.cpp \
     widgets/customers.cpp \
     widgets/info.cpp \
     widgets/lists.cpp \
+    widgets/products.cpp \
     widgets/records.cpp \
     widgets/sellers.cpp
 
 HEADERS += \
+    dialogs/loadsupplierpricelist.h \
     dialogs/setlisttype.h \
     global.h \
     mainwindow.h \
     utils/barcodelabelprinter.h \
     utils/code128/code128.h \
     utils/code128/code128item.h \
+    utils/pricelistparsertodb.h \
     widgets/cars.h \
     widgets/customers.h \
     widgets/info.h \
     widgets/lists.h \
+    widgets/products.h \
     widgets/records.h \
     widgets/sellers.h
 
 FORMS += \
+    dialogs/loadsupplierpricelist.ui \
     dialogs/setlisttype.ui \
     mainwindow.ui \
     widgets/cars.ui \
     widgets/customers.ui \
     widgets/info.ui \
     widgets/lists.ui \
+    widgets/products.ui \
     widgets/records.ui \
     widgets/sellers.ui
 

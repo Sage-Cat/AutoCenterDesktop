@@ -63,7 +63,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../recources/recources.qrc">
+        <iconset resource="../recources/all.qrc">
          <normaloff>:/icons/open_file.png</normaloff>:/icons/open_file.png</iconset>
        </property>
       </widget>
@@ -220,7 +220,7 @@
    <item>
     <widget class="QLabel" name="label_status">
      <property name="text">
-      <string>Очікування</string>
+      <string>Готово</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -230,7 +230,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../recources/recources.qrc"/>
+  <include location="../recources/all.qrc"/>
  </resources>
  <connections>
   <connection>

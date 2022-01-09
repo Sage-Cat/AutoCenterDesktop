@@ -89,6 +89,8 @@ void Lists::on_btn_add_clicked()
 
     // #2 Get list type from user and count it's number
     QString listType = askListType();
+    if (listType == "-1")
+        return;
     int newNumber = getNewListNumber(listType);
 
     // #3 Add new empty list to db + refresh
@@ -157,6 +159,8 @@ void Lists::on_btn_create_clicked()
 
         // #1 Create new list with the same params and different type&number (if is needed)
         QString listType = askListType();
+        if (listType == "-1")
+            return;
         int newNumber = getNewListNumber(listType);
 
         QString query_str =
@@ -188,7 +192,7 @@ QString Lists::askListType()
     {
         SetListType *dlg = new SetListType;
         if (dlg->exec() != QDialog::Accepted)
-            return "NULL";
+            return "-1";
         listType = dlg->getSelectedType();
     }
     return listType;

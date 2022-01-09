@@ -75,7 +75,7 @@ void Records::on_comboBox_Seller_currentIndexChanged(int index)
 void Records::on_btn_add_clicked()
 {
     QSqlQuery qry;
-    qry.exec("INSERT INTO record(list_id) VALUES(" + QString::number(list_id) + ")");
+    qry.exec("INSERT INTO record(count, price, list_id) VALUES(1, '0.0', " + QString::number(list_id) + ")");
 
     updateView();
 }
@@ -125,10 +125,13 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
 {
     // #1 Find product_id by code
     QSqlQuery qry;
-    qry.exec("SELECT id FROM product WHERE code='" + data + "'");
+    qry.exec("SELECT id, price FROM product WHERE code='" + data + "'");
     if (qry.next())
-        // #2 Change product_id cell
+    {
+        // #2 Change product_id cell and price
         handleSimpleCellChange("product_id", qry.value(0).toString(), record_id);
+        handleSimpleCellChange("price", qry.value(1).toString(), record_id);
+    }
     else
         QMessageBox::information(this, "Повідомляю", "Товару з даним кодом у базі данних не знайдено", QMessageBox::Ok);
 }

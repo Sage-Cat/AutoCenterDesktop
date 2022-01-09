@@ -15,33 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QComboBox" name="comboBox">
-     <item>
-      <property name="text">
-       <string>Рахунок</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Видаткова накладна</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Товарний чек</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Податкова накладна</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Накладна на повернення</string>
-      </property>
-     </item>
-    </widget>
+    <widget class="QComboBox" name="comboBox"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

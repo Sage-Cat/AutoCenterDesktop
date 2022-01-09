@@ -15,6 +15,20 @@ public:
     explicit LoadSupplierPricelist(QWidget *parent = nullptr);
     ~LoadSupplierPricelist();
 
+private slots:
+    void on_btn_explorer_clicked();
+    void on_btn_load_clicked();
+
+    void on_btn_stop_clicked();
+
+    void on_btn_cancel_clicked();
+
+public slots:
+    void handleParserWorkEnd();
+
+signals:
+    void endParsing();
+
 private:
     Ui::LoadSupplierPricelist *ui;
 };
