@@ -993,6 +993,7 @@ QTabWidget::tab-bar {
     <addaction name="separator"/>
     <addaction name="act_customers"/>
     <addaction name="act_sellers"/>
+    <addaction name="act_goods"/>
    </widget>
    <widget class="QMenu" name="menu_file">
     <property name="font">
@@ -1076,6 +1077,11 @@ QTabWidget::tab-bar {
   <action name="act_products_info">
    <property name="text">
     <string>Товар</string>
+   </property>
+  </action>
+  <action name="act_goods">
+   <property name="text">
+    <string>Товари</string>
    </property>
   </action>
  </widget>

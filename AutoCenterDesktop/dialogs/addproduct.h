@@ -12,21 +12,14 @@ class AddProduct : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddProduct(QWidget *parent = nullptr,
-                        NetworkCommunication *networkCommunication = new NetworkCommunication(new TcpClient)
-            );
+    explicit AddProduct(QWidget *parent = nullptr);
     ~AddProduct();
-
-    const QString &getID_Product() const;
 
 private slots:
     void on_btn_add_clicked();
 
 private:
     Ui::AddProduct *ui;
-    NetworkCommunication *networkCommunication;
-
-    QString ID_Product;
 };
 
 #endif // ADDPRODUCT_H

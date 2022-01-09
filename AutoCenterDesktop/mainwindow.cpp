@@ -7,6 +7,7 @@
 #include "widgets/sellers.h"
 #include "widgets/info.h"
 #include "widgets/cars.h"
+#include "widgets/products.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -106,6 +107,13 @@ void MainWindow::on_act_sellers_triggered()
     // TODO: connet to method for info widget opening
 
     ui->tabWidget->addTab(tab, QIcon(":/icons/seller.png"), "Продавці");
+    ui->tabWidget->setCurrentWidget(tab);
+}
+
+void MainWindow::on_act_goods_triggered()
+{
+    Products *tab = new Products(this);
+    ui->tabWidget->addTab(tab, QIcon(":/icons/goods.ico"), "Товари");
     ui->tabWidget->setCurrentWidget(tab);
 }
 

@@ -8,9 +8,9 @@
 #include "global.h"
 #include "utils/pricelistparsertodb.h"
 
-LoadSupplierPricelist::LoadSupplierPricelist(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::LoadSupplierPricelist)
+LoadSupplierPricelist::LoadSupplierPricelist(QWidget* parent)
+    : QDialog(parent)
+    , ui(new Ui::LoadSupplierPricelist)
 {
     ui->setupUi(this);
 
@@ -28,8 +28,8 @@ LoadSupplierPricelist::~LoadSupplierPricelist()
 void LoadSupplierPricelist::on_btn_explorer_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, ("Відкрити файл"),
-                                                     "/",
-                                                     ("Xml-files (*.xml)"));
+        "/",
+        ("Xml-files (*.xml)"));
 
     ui->line_path->setText(fileName);
 }
@@ -37,18 +37,21 @@ void LoadSupplierPricelist::on_btn_explorer_clicked()
 void LoadSupplierPricelist::handleParserWorkEnd()
 {
     ui->label_status->setText("Готово");
+    ui->btn_stop->setDisabled(true);
+    ui->btn_cancel->setDisabled(false);
+
+    QMessageBox::information(this, "Повідомлення", "Прайслист поставщика " + ui->comboBox->currentText() + " успішно завантажено!");
 }
 
 void LoadSupplierPricelist::on_btn_load_clicked()
 {
     QString fileName = ui->line_path->text();
-    if (!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         ui->btn_cancel->setDisabled(true);
         ui->btn_stop->setDisabled(false);
 
-        QThread *thread = new QThread;
-        PricelistParserToDB *parser = new PricelistParserToDB(this, fileName);
+        QThread* thread = new QThread;
+        PricelistParserToDB* parser = new PricelistParserToDB(this, fileName);
 
         parser->moveToThread(thread);
 
@@ -67,18 +70,15 @@ void LoadSupplierPricelist::on_btn_load_clicked()
             connect(thread, &QThread::started, parser, &PricelistParserToDB::parseAsOmegaPriceList);
             thread->start();
         }
-    }
-    else
+    } else
         QMessageBox::information(this, "Попередження", "Уведіть, будь-ласка, шлях до файлу", QMessageBox::Ok);
 }
 
 void LoadSupplierPricelist::on_btn_stop_clicked()
 {
-
 }
 
 void LoadSupplierPricelist::on_btn_cancel_clicked()
 {
     this->reject();
 }
-

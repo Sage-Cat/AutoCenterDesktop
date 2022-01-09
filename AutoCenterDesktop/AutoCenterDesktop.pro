@@ -9,6 +9,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    dialogs/addproduct.cpp \
+    dialogs/findproduct.cpp \
     dialogs/loadsupplierpricelist.cpp \
     dialogs/setlisttype.cpp \
     main.cpp \
@@ -26,6 +28,8 @@ SOURCES += \
     widgets/sellers.cpp
 
 HEADERS += \
+    dialogs/addproduct.h \
+    dialogs/findproduct.h \
     dialogs/loadsupplierpricelist.h \
     dialogs/setlisttype.h \
     global.h \
@@ -43,6 +47,8 @@ HEADERS += \
     widgets/sellers.h
 
 FORMS += \
+    dialogs/addproduct.ui \
+    dialogs/findproduct.ui \
     dialogs/loadsupplierpricelist.ui \
     dialogs/setlisttype.ui \
     mainwindow.ui \
