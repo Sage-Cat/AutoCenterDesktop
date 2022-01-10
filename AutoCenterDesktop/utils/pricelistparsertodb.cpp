@@ -3,11 +3,26 @@
 #include <QXmlStreamReader>
 #include <QFile>
 
-#include "widgets/products.h"
+#include <QTextCodec>
+#include <QTextStream>
 
-PricelistParserToDB::PricelistParserToDB(QObject *parent, const QString &fileName) :
+void PricelistParserToDB::addNewProductToQueue(QString code, QString catalog, QString tnved, QString name, QString unit, QString price)
+{
+    Product *product = new Product;
+    product->code = code;
+    product->catalog = catalog;
+    product->tnved = tnved;
+    product->name = name;
+    product->unit = unit;
+    product->price = price;
+
+    products_queue->enqueue(product);
+}
+
+PricelistParserToDB::PricelistParserToDB(QObject *parent, const QString &fileName, QQueue<Product *> *products_queue) :
     QObject(parent),
-    fileName(fileName)
+    fileName(fileName),
+    products_queue(products_queue)
 {
     countApproximateNumberOfRecordsInFile();
 }
@@ -18,17 +33,19 @@ void PricelistParserToDB::countApproximateNumberOfRecordsInFile()
     if (!file.open(QIODevice::ReadOnly))
         return;
 
+    QTextStream stream(&file);
+    stream.setCodec(QTextCodec::codecForName("Windows-1251"));
+
     const qint64 fileSize = file.size();
     qint64 keyWordCount {}, symbols_count {};
     while (keyWordCount < RECORDS_COUNT_TO_CHECK)
     {
-        QByteArray line = file.readLine();
+        QString line = stream.readLine();
         symbols_count += line.size();
-        if (line.contains(QByteArray("</Прайс>"))) // means that one more record is checked
+        if (line.contains("</Прайс>")) // means that one more record is checked
             keyWordCount++;
     }
     const qint64 averageCountOfSymbolsPerRecord = symbols_count / RECORDS_COUNT_TO_CHECK;
-
     approximateCountOfRecordsInFile = averageCountOfSymbolsPerRecord / fileSize;
 }
 
@@ -71,7 +88,7 @@ void PricelistParserToDB::parseAsOmegaPriceList()
 
             // INSERT NEW RECORD
             if(Code != "-")
-                Products::insertProductToDb(Code, Catalog, TNVED, Name, Unit, Price);
+                addNewProductToQueue(Code, Catalog, TNVED, Name, Unit, Price);
 
             // SET DEFAULT TO CHECK FOR A FOOL
             // ex: user wants to load the pricelist with a similar start "Прайс", but with different keys

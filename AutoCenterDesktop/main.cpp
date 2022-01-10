@@ -8,6 +8,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+#include <QDebug>
+
 bool initDB(QMainWindow *parent, QSqlDatabase *db);
 
 int main(int argc, char *argv[])

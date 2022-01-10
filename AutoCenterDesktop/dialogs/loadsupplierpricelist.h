@@ -2,17 +2,21 @@
 #define LOADSUPPLIERPRICELIST_H
 
 #include <QDialog>
+#include <QQueue>
+
+class QThread;
+class PricelistParserToDB;
+class Product;
 
 namespace Ui {
 class LoadSupplierPricelist;
 }
 
-class LoadSupplierPricelist : public QDialog
-{
+class LoadSupplierPricelist : public QDialog {
     Q_OBJECT
 
 public:
-    explicit LoadSupplierPricelist(QWidget *parent = nullptr);
+    explicit LoadSupplierPricelist(QWidget* parent = nullptr);
     ~LoadSupplierPricelist();
 
 private slots:
@@ -22,13 +26,15 @@ private slots:
     void on_btn_cancel_clicked();
 
 public slots:
-    void handleParserWorkEnd();
-
+    void loadParsedDataToDB();
 signals:
     void endParsing();
 
 private:
-    Ui::LoadSupplierPricelist *ui;
+    Ui::LoadSupplierPricelist* ui;
+    QThread *thread;
+    PricelistParserToDB *parser;
+    QQueue<Product *> products_queue;
 };
 
 #endif // LOADSUPPLIERPRICELIST_H
