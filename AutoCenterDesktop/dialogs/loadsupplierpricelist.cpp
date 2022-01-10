@@ -37,10 +37,9 @@ void LoadSupplierPricelist::on_btn_load_clicked()
 {
     QString fileName = ui->line_path->text();
 
-    ui->label_status->setText("Розархівування...");
-
     if (!fileName.isEmpty()) {
         ui->btn_cancel->setDisabled(true);
+        ui->label_status->setText("Розархівування...");
 
         thread = new QThread;
         parser = new PricelistParserToDB(this, fileName, &products_queue);
@@ -74,6 +73,7 @@ void LoadSupplierPricelist::on_btn_cancel_clicked()
 void LoadSupplierPricelist::loadParsedDataToDB()
 {
     ui->label_status->setText("Завантаження до бази даних...");
+    ui->progressBar->setValue(0);
 
     const int productsCountForOnePercent = products_queue.size() / 100;
     int counter {}, progressBarValue {};

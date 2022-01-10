@@ -46,7 +46,7 @@ void PricelistParserToDB::countApproximateNumberOfRecordsInFile()
             keyWordCount++;
     }
     const qint64 averageCountOfSymbolsPerRecord = symbols_count / RECORDS_COUNT_TO_CHECK;
-    approximateCountOfRecordsInFile = averageCountOfSymbolsPerRecord / fileSize;
+    approximateCountOfRecordsInFile = fileSize / averageCountOfSymbolsPerRecord;
 }
 
 void PricelistParserToDB::parseAsOmegaPriceList()
@@ -107,5 +107,6 @@ void PricelistParserToDB::parseAsOmegaPriceList()
         else
             miss_count++;
     }
+    emit progressChanged(100);
     emit workFinished();
 }
