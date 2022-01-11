@@ -81,7 +81,7 @@ void Code128Item::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
         if ( i % 2 == 0 )
         {
-            QRectF bar(left, 0, width, m_Height - fontHeight );
+            QRectF bar(left, 0, width, m_Height - fontHeight * 3);
             painter->fillRect(bar, Qt::SolidPattern);
         }
 
@@ -90,8 +90,8 @@ void Code128Item::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
     if ( m_TextVisible )
     {
-        QRectF box(0, m_Height - fontHeight , left, fontHeight);
-        painter->drawText(box, m_Text, Qt::AlignHCenter | Qt::AlignVCenter);
+        QRectF box(0, m_Height - fontHeight * 3, left, fontHeight * 3);
+        painter->drawText(box, m_Text, Qt::AlignHCenter | Qt::AlignTop);
     }
 }
 

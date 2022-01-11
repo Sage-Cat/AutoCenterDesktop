@@ -16,6 +16,7 @@ void BarcodeLabelPrinter::printLabels(const QVector<Label>& labels)
         Code128Item* m_Barcode = createCode128Label(label);
 
         QPainter painter(&printer);
+        painter.setFont(QFont("Helvetica", 8));
 
         for (int i = 0; i < label.timesToPrint; ++i)
             m_Barcode->paint(&painter, nullptr, nullptr);
