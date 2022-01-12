@@ -11,6 +11,7 @@
 
 #include "global.h"
 
+#include <QDebug>
 
 /*!
  * \brief Lists::setModelFilter sets complex filter system. We need it due to number of characteristics
@@ -165,23 +166,27 @@ void Lists::on_btn_create_clicked()
 
         QString query_str =
                 "INSERT INTO list(number, type, customer_id, seller_id) "
-                    "SELECT %1, %2, customer_id, seller_id FROM list WHERE ID=%3";
-        qry.exec(query_str.arg(QString::number(newNumber), listType, QString::number(list_id)));
-
-        // #2 Get created list's id
-        qry.exec("SELECT MAX(id) FROM list");
-        if (qry.next())
+                    "SELECT '%1', '%2', customer_id, seller_id FROM list WHERE ID='%3'";
+        query_str = query_str.arg(QString::number(newNumber), listType, QString::number(list_id));
+        qDebug() << query_str;
+        if (qry.exec(query_str))
         {
-            const QString created_list_id = qry.value(0).toString();
+            // #2 Get created list's id
+            qry.exec("SELECT MAX(id) FROM list");
+            if (qry.next())
+            {
+                const QString created_list_id = qry.value(0).toString();
 
-            // #3 Copy all records to new list
-            query_str =
-                    "INSERT INTO record(count, price, product_id, list_id) "
-                        "SELECT count, price, product_id, %1 FROM record WHERE list_id=%2";
-            qry.exec(query_str.arg(created_list_id, QString::number(list_id)));
+                // #3 Copy all records to new list
+                query_str =
+                        "INSERT INTO record(count, price, product_id, list_id) "
+                            "SELECT count, price, product_id, %1 FROM record WHERE list_id=%2";
+                qry.exec(query_str.arg(created_list_id, QString::number(list_id)));
 
-            emit tabRecordsRequested(list_id);
+                emit tabRecordsRequested(list_id);
+            }
         }
+        updateView();
     }
 }
 
