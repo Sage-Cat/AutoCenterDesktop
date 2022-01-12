@@ -10,7 +10,7 @@ SetListType::SetListType(QWidget *parent) :
     ui->setupUi(this);
 
     ui->comboBox->addItem("");
-    ui->comboBox->addItems(docTypes.mid(0, docTypes.size() - 1)); // without receipt
+    ui->comboBox->addItems(DOC_TYPES_NAMES.mid(0, DOC_TYPES_NAMES.size() - 1)); // without receipt
 }
 
 SetListType::~SetListType()

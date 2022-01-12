@@ -18,6 +18,7 @@ SOURCES += \
     utils/barcodelabelprinter.cpp \
     utils/code128/code128.cpp \
     utils/code128/code128item.cpp \
+    utils/documentprinter.cpp \
     utils/pricelistparsertodb.cpp \
     widgets/cars.cpp \
     widgets/customers.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     utils/barcodelabelprinter.h \
     utils/code128/code128.h \
     utils/code128/code128item.h \
+    utils/documentprinter.h \
     utils/pricelistparsertodb.h \
     widgets/cars.h \
     widgets/customers.h \

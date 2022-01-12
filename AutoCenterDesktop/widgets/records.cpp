@@ -4,11 +4,12 @@
 #include <QSqlQuery>
 #include <QSqlTableModel>
 
-#include <QVector>
 #include <QMessageBox>
+#include <QVector>
 
-#include <QPainter>
+#include "global.h"
 #include "utils/barcodelabelprinter.h"
+#include "utils/documentprinter.h"
 
 Records::Records(QWidget* parent, int list_id)
     : QWidget(parent)
@@ -30,9 +31,9 @@ Records::Records(QWidget* parent, int list_id)
     model->setHeaderData(3, Qt::Horizontal, tr("Каталог"));
     model->setHeaderData(4, Qt::Horizontal, tr("ТНВЕД"));
     model->setHeaderData(5, Qt::Horizontal, tr("Назва"));
-    model->setHeaderData(6, Qt::Horizontal, tr("Ціна"));
-    model->setHeaderData(7, Qt::Horizontal, tr("К-сть"));
-    model->setHeaderData(8, Qt::Horizontal, tr("Одиниці"));
+    model->setHeaderData(6, Qt::Horizontal, tr("К-сть"));
+    model->setHeaderData(7, Qt::Horizontal, tr("Одиниці"));
+    model->setHeaderData(8, Qt::Horizontal, tr("Ціна"));
     model->setHeaderData(9, Qt::Horizontal, tr("Сума"));
 
     ui->tableView->setModel(model);
@@ -45,8 +46,8 @@ Records::Records(QWidget* parent, int list_id)
     // Comboboxes
     initComboboxes();
 
-    // Datetime
-    initDateTime();
+    // Datetime and enable or disable print buttons
+    initDateTimeAndPrintButtons();
 
     connect(model, &QSqlTableModel::dataChanged, this, &Records::handleDataChange);
 }
@@ -85,8 +86,7 @@ void Records::on_btn_del_clicked()
     const auto selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
     if (selectedIndexes.isEmpty())
         return;
-    const QString record_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
-            .data(Qt::DisplayRole).toString();
+    const QString record_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toString();
 
     QSqlQuery qry;
     qry.exec("PRAGMA foreign_keys=ON");
@@ -98,7 +98,7 @@ void Records::on_btn_del_clicked()
 void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
 {
     const QVector<int> editableColumns = {
-        2 /* code */, 6 /* price */, 7 /* count */
+        CODE_COLUMN_INDEX /* code */, PRICE_COLUMN_INDEX /* price */, COUNT_COLUMN_INDEX /* count */
     };
     const int column = topLeft.column();
     const QString data = topLeft.data(Qt::DisplayRole).toString();
@@ -109,10 +109,10 @@ void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
         case 2: {
             handleProductCodeChange(data, record_id);
         } break;
-        case 6: {
+        case 8: {
             handleSimpleCellChange("price", data, record_id);
         } break;
-        case 7: {
+        case 6: {
             handleSimpleCellChange("count", data, record_id);
         } break;
         }
@@ -126,13 +126,11 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
     // #1 Find product_id by code
     QSqlQuery qry;
     qry.exec("SELECT id, price FROM product WHERE code='" + data + "'");
-    if (qry.next())
-    {
+    if (qry.next()) {
         // #2 Change product_id cell and price
         handleSimpleCellChange("product_id", qry.value(0).toString(), record_id);
         handleSimpleCellChange("price", qry.value(1).toString(), record_id);
-    }
-    else
+    } else
         QMessageBox::information(this, "Повідомляю", "Товару з даним кодом у базі данних не знайдено", QMessageBox::Ok);
 }
 
@@ -146,11 +144,9 @@ void Records::handleSimpleCellChange(const QString& columnName, const QString& d
 void Records::on_btn_print_barcode_clicked()
 {
     const auto selectedRows = ui->tableView->selectionModel()->selectedRows(CODE_COLUMN_INDEX);
-    if (!selectedRows.isEmpty())
-    {
+    if (!selectedRows.isEmpty()) {
         QVector<BarcodeLabelPrinter::Label> labels;
-        for (const QModelIndex &code : selectedRows)
-        {
+        for (const QModelIndex& code : selectedRows) {
             BarcodeLabelPrinter::Label label;
             label.barcodeData = code.data(Qt::DisplayRole).toString();
             label.labelText = code.siblingAtColumn(NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString();
@@ -165,6 +161,27 @@ void Records::on_btn_print_barcode_clicked()
 
 void Records::on_btn_print_document_clicked()
 {
+    QSqlQuery qry;
+    qry.exec("SELECT number FROM list WHERE id=" + QString::number(list_id));
+    if (!qry.next())
+        return;
+    const QString listNumber = qry.value(0).toString();
+
+    qry.exec("SELECT name, iban, bank, edrpoy, number, ipn FROM seller WHERE id=" + seller_index_to_id[ui->comboBox_Seller->currentIndex()]);
+    Seller seller;
+    if (!qry.next())
+        return;
+    seller.name = qry.value(0).toString();
+    seller.iban = qry.value(1).toString();
+    seller.bank = qry.value(2).toString();
+    seller.edrpoy = qry.value(3).toString();
+    seller.number = qry.value(4).toString();
+    seller.ipn = qry.value(5).toString();
+
+    DocumentPrinter* printer = new DocumentPrinter();
+    if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
+        printer->printPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
+                                 ui->line_datetime->text(), listNumber);
 }
 
 void Records::updateView()
@@ -178,16 +195,21 @@ void Records::updateView()
     float sum {};
     if (qry.next())
         sum = qry.value(0).toFloat();
-    ui->line_sum->setText(QString::number(sum, 'G', 12));
+    ui->line_sum->setText(QString::number(sum, 'G'));
 }
 
-void Records::initDateTime()
+void Records::initDateTimeAndPrintButtons()
 {
     QSqlQuery qry;
-    qry.exec("SELECT datetime FROM list WHERE id=" + QString::number(list_id));
+    qry.exec("SELECT datetime, type FROM list WHERE id=" + QString::number(list_id));
     QString datetime {};
-    if (qry.next())
+    if (qry.next()) {
         datetime = qry.value(0).toString();
+
+        docType = qry.value(1).toString();
+        if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya))
+            ui->btn_print_document->setDisabled(true);
+    }
     ui->line_datetime->setText(datetime);
 }
 

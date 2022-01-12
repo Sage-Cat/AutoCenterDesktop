@@ -1,8 +1,8 @@
 #include "customers.h"
 #include "ui_customers.h"
 
-#include <QSqlTableModel>
 #include <QSqlQuery>
+#include <QSqlQueryModel>
 
 Customers::Customers(QWidget *parent) :
     QWidget(parent),
@@ -13,8 +13,9 @@ Customers::Customers(QWidget *parent) :
     // model for tableView
     model = new QSqlTableModel();
     model->setTable("customer_view");
+    //qobject_cast<QSqlQueryModel *>(model)->setQuery("select * from customer_view");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    updateView();
+    model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Ім'я")); // only organizations will have ipn
     model->setHeaderData(2, Qt::Horizontal, tr("К-сть авто"));
@@ -53,7 +54,7 @@ void Customers::on_btn_del_clicked()
     if (!selected_indexes.isEmpty())
     {
         qry.exec("PRAGMA foreign_keys=ON");
-        qry.exec("DELETE FROM seller WHERE id=" + selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+        qry.exec("DELETE FROM customer WHERE id=" + selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
                  .data(Qt::DisplayRole).toString()
                  );
     }

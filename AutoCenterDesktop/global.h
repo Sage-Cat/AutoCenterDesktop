@@ -3,15 +3,23 @@
 
 #include <QStringList>
 
-const QStringList docTypes {
+const QStringList DOC_TYPES_NAMES {
     "Рахунок",
     "Видаткова накладна",
     "Товарний чек",
     "Податкова накладна",
-    "Накладні на повернення",
+    "Накладна на повернення",
     "Накладна на надходження"
 };
-const int RECEIPT_DOCUMENT_NAME_ID = 5;
+
+enum DOC_TYPES {
+    Rahunok,
+    Vydatkova_nakladna,
+    Tovarniy_chek,
+    Podatkova_nakladna,
+    Nakladna_na_povernennya,
+    Nakladna_na_nadhodjennya
+};
 
 const QStringList Suppliers {
     "Омега"

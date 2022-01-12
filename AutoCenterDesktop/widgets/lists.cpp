@@ -23,7 +23,7 @@ void Lists::setModelFilter(FilterFlag flag)
     QString filter {
         isSale ? "type <> " : "type == "
     };
-    filter += "'" + docTypes.at(RECEIPT_DOCUMENT_NAME_ID) + "'";
+    filter += "'" + DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya) + "'";
 
     // #2 Check for combobox filters
     if (flag == FilterFlag::ShowOrganizationsOnly)
@@ -187,7 +187,7 @@ void Lists::on_btn_create_clicked()
 
 QString Lists::askListType()
 {
-    QString listType = docTypes.at(RECEIPT_DOCUMENT_NAME_ID);
+    QString listType = DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya);
     if (isSale)
     {
         SetListType *dlg = new SetListType;

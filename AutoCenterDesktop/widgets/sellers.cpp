@@ -22,6 +22,7 @@ Sellers::Sellers(QWidget *parent) :
     model->setHeaderData(4, Qt::Horizontal, tr("ЄДРПОУ"));
     model->setHeaderData(5, Qt::Horizontal, tr("ІПН"));
     model->setHeaderData(6, Qt::Horizontal, tr("Адреса"));
+    model->setHeaderData(7, Qt::Horizontal, tr("Номер"));
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID

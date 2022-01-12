@@ -20,7 +20,10 @@ class Records : public QWidget {
     const int LIST_ID_COLUMN_INDEX { 1 };
     const int CODE_COLUMN_INDEX { 2 };
     const int NAME_COLUMN_INDEX { 5 };
-    const int COUNT_COLUMN_INDEX { 7 };
+    const int COUNT_COLUMN_INDEX { 6 };
+    const int UNIT_COLUMN_INDEX { 7 };
+    const int PRICE_COLUMN_INDEX { 8 };
+    const int SUM_COLUMN_INDEX { 9 };
 
 public:
     explicit Records(QWidget* parent = nullptr, int list_id = 0);
@@ -46,7 +49,7 @@ private slots:
 
     /* UPDATE&INIT */
     void updateView();
-    void initDateTime();
+    void initDateTimeAndPrintButtons();
     void initComboboxes();
 
     /* CUSTOM */
@@ -60,6 +63,7 @@ private:
     int list_id;
     QSqlTableModel* model;
     QMap<int, QString> customer_index_to_id, seller_index_to_id;
+    QString docType {};
 };
 
 /*!

@@ -15,5 +15,6 @@
         <file>icons/seller.png</file>
         <file>icons/work.png</file>
         <file>db_init.sql</file>
+        <file>pdv_rahunok.htm</file>
     </qresource>
 </RCC>

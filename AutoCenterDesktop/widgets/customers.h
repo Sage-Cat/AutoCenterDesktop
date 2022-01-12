@@ -3,7 +3,9 @@
 
 #include <QWidget>
 
-class QSqlTableModel;
+#include <QSqlTableModel>
+
+class QSqlQueryModel;
 
 namespace Ui {
 class Customers;
