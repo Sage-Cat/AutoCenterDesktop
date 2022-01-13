@@ -250,7 +250,7 @@ void Records::initComboboxes()
     qry.exec("SELECT id, name FROM customer");
     int index {};
     customer_index_to_id[index] = NULL_STR; // for empty (default)
-    ui->comboBox_Customer->insertItem(index, "");
+    ui->comboBox_Customer->insertItem(index, "Кінцевий покупець");
     index++;
     while (qry.next()) {
         customer_index_to_id[index] = qry.value(0).toString() /*id*/;
@@ -269,9 +269,6 @@ void Records::initComboboxes()
     // Sellers
     qry.exec("SELECT id, name FROM seller");
     index = 0;
-    seller_index_to_id[index] = NULL_STR; // for empty (default)
-    ui->comboBox_Seller->insertItem(index, "");
-    index++;
     while (qry.next()) {
         seller_index_to_id[index] = qry.value(0).toString() /*id*/;
         ui->comboBox_Seller->insertItem(

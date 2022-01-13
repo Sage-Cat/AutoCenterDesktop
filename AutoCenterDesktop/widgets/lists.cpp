@@ -1,13 +1,13 @@
 #include "lists.h"
 #include "ui_lists.h"
 
-#include <QSqlTableModel>
 #include <QSqlQuery>
+#include <QSqlTableModel>
 
 #include <QMessageBox>
 
-#include "mainwindow.h"
 #include "dialogs/setlisttype.h"
+#include "mainwindow.h"
 
 #include "global.h"
 
@@ -36,10 +36,10 @@ void Lists::setModelFilter(FilterFlag flag)
     model->select();
 }
 
-Lists::Lists(QWidget *parent, bool isSale) :
-    QWidget(parent),
-    ui(new Ui::Lists),
-    isSale(isSale)
+Lists::Lists(QWidget* parent, bool isSale)
+    : QWidget(parent)
+    , ui(new Ui::Lists)
+    , isSale(isSale)
 {
     ui->setupUi(this);
 
@@ -62,8 +62,7 @@ Lists::Lists(QWidget *parent, bool isSale) :
 
     //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
-    {
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
         if (i == 5 || i == 6)
             ui->tableView->setColumnWidth(i, 600);
         else if (i == 2 || i == 4)
@@ -86,16 +85,12 @@ void Lists::on_btn_add_clicked()
     // #1 Get MAX+1 id to insert new row
     qry.exec("SELECT MAX(id) FROM list");
     int next_id {};
-    if (!qry.next())
-    {
+    if (!qry.next()) {
         QMessageBox::warning(this,
-                             "Попередження",
-                             "Не вдалося знайти жодного запису у базі даних. Почато рахунок з початку",
-                             QMessageBox::Ok
-                             );
-    }
-    else
-    {
+            "Попередження",
+            "Не вдалося знайти жодного запису у базі даних. Почато рахунок з початку",
+            QMessageBox::Ok);
+    } else {
         next_id = qry.value(0).toInt() + 1;
     }
 
@@ -106,11 +101,7 @@ void Lists::on_btn_add_clicked()
     int newNumber = getNewListNumber(listType);
 
     // #3 Add new empty list to db + refresh
-    qry.exec("INSERT INTO list(id, number, type) VALUES(" +
-             QString::number(next_id) + ", " +
-             QString::number(newNumber) + ", '" +
-             listType +
-             "')");
+    qry.exec("INSERT INTO list(id, number, type) VALUES(" + QString::number(next_id) + ", " + QString::number(newNumber) + ", '" + listType + "')");
     model->select();
 
     // #4 Open new tab for created list
@@ -120,13 +111,19 @@ void Lists::on_btn_add_clicked()
 void Lists::on_btn_del_clicked()
 {
     const auto selectedRows = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
-    if (!selectedRows.isEmpty())
-    {
-        const QString id = selectedRows.front().data(Qt::DisplayRole).toString();
-        QSqlQuery qry;
-        qry.exec("PRAGMA foreign_keys=ON");
-        qry.exec("DELETE FROM list WHERE id=" + id);
-        model->select();
+    if (!selectedRows.isEmpty()) {
+
+        auto result = QMessageBox::warning(this, "Попередження", "Ви впевненні, що хочете видалити запис " + selectedRows.front().siblingAtColumn(4).data(Qt::DisplayRole).toString() + "?",
+            QMessageBox::Yes | QMessageBox::No);
+
+        if (result == QMessageBox::Yes)
+        {
+            const QString id = selectedRows.front().data(Qt::DisplayRole).toString();
+            QSqlQuery qry;
+            qry.exec("PRAGMA foreign_keys=ON");
+            qry.exec("DELETE FROM list WHERE id=" + id);
+            model->select();
+        }
     }
 }
 
@@ -145,7 +142,7 @@ void Lists::on_radio_not_org_clicked()
     setModelFilter(FilterFlag::ShowCustomersOnly);
 }
 
-void Lists::on_tableView_doubleClicked(const QModelIndex &index)
+void Lists::on_tableView_doubleClicked(const QModelIndex& index)
 {
     const int list_id = index.siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toInt();
     emit tabRecordsRequested(list_id);
@@ -153,7 +150,6 @@ void Lists::on_tableView_doubleClicked(const QModelIndex &index)
 
 void Lists::on_btn_load_clicked()
 {
-
 }
 
 void Lists::updateView()
@@ -164,8 +160,7 @@ void Lists::updateView()
 void Lists::on_btn_create_clicked()
 {
     const auto selectedRow = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
-    if (!selectedRow.isEmpty())
-    {
+    if (!selectedRow.isEmpty()) {
         const int list_id = selectedRow.at(0).data(Qt::DisplayRole).toInt();
         QSqlQuery qry;
 
@@ -175,21 +170,17 @@ void Lists::on_btn_create_clicked()
             return;
         int newNumber = getNewListNumber(listType);
 
-        QString query_str =
-                "INSERT INTO list(number, type, customer_id, seller_id) "
-                    "SELECT '%1', '%2', customer_id, seller_id FROM list WHERE ID='%3'";
+        QString query_str = "INSERT INTO list(number, type, customer_id, seller_id) "
+                            "SELECT '%1', '%2', customer_id, seller_id FROM list WHERE ID='%3'";
         query_str = query_str.arg(QString::number(newNumber), listType, QString::number(list_id));
-        if (qry.exec(query_str))
-        {
+        if (qry.exec(query_str)) {
             // #2 Get created list's id
             qry.exec("SELECT MAX(id) FROM list");
-            if (qry.next())
-            {
+            if (qry.next()) {
                 const QString created_list_id = qry.value(0).toString();
 
                 // #3 Copy all records to new list
-                query_str =
-                        "INSERT INTO record(count, price, product_id, list_id) "
+                query_str = "INSERT INTO record(count, price, product_id, list_id) "
                             "SELECT count, price, product_id, %1 FROM record WHERE list_id=%2";
                 qry.exec(query_str.arg(created_list_id, QString::number(list_id)));
 
@@ -203,9 +194,8 @@ void Lists::on_btn_create_clicked()
 QString Lists::askListType()
 {
     QString listType = DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya);
-    if (isSale)
-    {
-        SetListType *dlg = new SetListType;
+    if (isSale) {
+        SetListType* dlg = new SetListType;
         if (dlg->exec() != QDialog::Accepted)
             return {};
         listType = dlg->getSelectedType();
@@ -213,24 +203,19 @@ QString Lists::askListType()
     return listType;
 }
 
-int Lists::getNewListNumber(const QString &listType)
+int Lists::getNewListNumber(const QString& listType)
 {
     QSqlQuery qry;
     qry.exec("SELECT MAX(number) FROM list WHERE type == '" + listType + "'");
     int newNumber {};
-    if (!qry.next())
-    {
+    if (!qry.next()) {
         QMessageBox::warning(this,
-                             "Попередження",
-                             "Не вдалося знайти жодного списку типу " + listType +  " у базі даних. Почато рахунок з початку",
-                             QMessageBox::Ok
-                             );
-    }
-    else
-    {
+            "Попередження",
+            "Не вдалося знайти жодного списку типу " + listType + " у базі даних. Почато рахунок з початку",
+            QMessageBox::Ok);
+    } else {
         newNumber = qry.value(0).toInt() + 1;
     }
 
     return newNumber;
 }
-
