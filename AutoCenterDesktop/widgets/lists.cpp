@@ -59,7 +59,18 @@ Lists::Lists(QWidget *parent, bool isSale) :
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->setColumnHidden(IPN_COLUMN_INDEX, true); // hide IPN
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
+    {
+        if (i == 5 || i == 6)
+            ui->tableView->setColumnWidth(i, 600);
+        else if (i == 2 || i == 4)
+            ui->tableView->setColumnWidth(i, 300);
+        else
+            ui->tableView->setColumnWidth(i, 150);
+    }
 
     setModelFilter(FilterFlag::ShowAll);
 }

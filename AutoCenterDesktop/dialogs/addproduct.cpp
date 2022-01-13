@@ -15,6 +15,11 @@ AddProduct::~AddProduct()
     delete ui;
 }
 
+void AddProduct::setCodeToLineEdit(QString code)
+{
+    ui->line_code->setText(code);
+}
+
 void AddProduct::on_btn_add_clicked()
 {
     Products::insertProductToDb(

@@ -268,6 +268,9 @@ margin-right: 5px;</string>
        <pointsize>14</pointsize>
       </font>
      </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
     </widget>
    </item>
    <item>

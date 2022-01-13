@@ -11,6 +11,8 @@
 #include "utils/barcodelabelprinter.h"
 #include "utils/documentprinter.h"
 
+#include "dialogs/addproduct.h"
+
 Records::Records(QWidget* parent, int list_id)
     : QWidget(parent)
     , ui(new Ui::Records)
@@ -38,10 +40,22 @@ Records::Records(QWidget* parent, int list_id)
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
-    ui->tableView->setColumnHidden(LIST_ID_COLUMN_INDEX, true); // hide ID
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableView->setItemDelegateForColumn(6, new NumberFormatDelegate(this));
+    ui->tableView->setColumnHidden(LIST_ID_COLUMN_INDEX, true); // hide list_id
+    ui->tableView->setColumnHidden(3, true); // hide catalog
+    ui->tableView->setColumnHidden(4, true); // hide tnved
+    ui->tableView->setItemDelegateForColumn(8, new NumberFormatDelegate(this));
     ui->tableView->setItemDelegateForColumn(9, new NumberFormatDelegate(this));
+
+    //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
+        if (i == NAME_COLUMN_INDEX)
+            ui->tableView->setColumnWidth(i, 800);
+        else if (i == CODE_COLUMN_INDEX)
+            ui->tableView->setColumnWidth(i, 300);
+        else
+            ui->tableView->setColumnWidth(i, 150);
+    }
 
     // Comboboxes
     initComboboxes();
@@ -130,8 +144,20 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
         // #2 Change product_id cell and price
         handleSimpleCellChange("product_id", qry.value(0).toString(), record_id);
         handleSimpleCellChange("price", qry.value(1).toString(), record_id);
-    } else
-        QMessageBox::information(this, "Повідомляю", "Товару з даним кодом у базі данних не знайдено", QMessageBox::Ok);
+    } else {
+        auto result = QMessageBox::information(this, "Повідомляю",
+            "Товару з даним кодом у базі данних не знайдено.\n"
+            "Можливо ви хочете додати новий вид товару?",
+            QMessageBox::Yes | QMessageBox::No);
+
+        if (result == QMessageBox::Yes)
+        {
+            AddProduct *dlg = new AddProduct;
+            dlg->setCodeToLineEdit(data);
+            if (dlg->exec() == QDialog::Accepted)
+                handleProductCodeChange(data, record_id);
+        }
+    }
 }
 
 void Records::handleSimpleCellChange(const QString& columnName, const QString& data, const QString& record_id)
@@ -181,7 +207,7 @@ void Records::on_btn_print_document_clicked()
     DocumentPrinter* printer = new DocumentPrinter();
     if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
         printer->printPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
-                                 ui->line_datetime->text(), listNumber);
+            ui->line_datetime->text(), listNumber);
 }
 
 void Records::updateView()

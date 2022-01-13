@@ -148,7 +148,7 @@
           </font>
          </property>
          <property name="text">
-          <string/>
+          <string>шт.</string>
          </property>
         </widget>
        </item>

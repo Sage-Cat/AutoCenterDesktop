@@ -31,7 +31,18 @@ Products::Products(QWidget *parent) :
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
+    {
+        if (i == 5)
+            ui->tableView->setColumnWidth(i, 700);
+        else if (i == 2 || i == 3 || i == 4)
+            ui->tableView->setColumnWidth(i, 200);
+        else
+            ui->tableView->setColumnWidth(i, 150);
+    }
 }
 
 Products::~Products()

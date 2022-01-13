@@ -43,7 +43,7 @@ void MainWindow::closeTab(int index)
 
 void MainWindow::on_act_sales_triggered()
 {
-    openTabLists(true, "Реалізації");
+    openTabLists(true, "Усі реалізації");
 }
 
 void MainWindow::openTabLists(bool isSale, QString label)
@@ -64,7 +64,7 @@ void MainWindow::openTabRecords(int list_id)
     if (sender_tab)
         connect(tab, &Records::listDataChanged, sender_tab, &Lists::updateView);
 
-    ui->tabWidget->addTab(tab, QIcon(":/icons/page.png"), "Редагування списку");
+    ui->tabWidget->addTab(tab, QIcon(":/icons/page.png"), "Список");
     ui->tabWidget->setCurrentWidget(tab);
 }
 
@@ -88,7 +88,7 @@ void MainWindow::openTabCars(int customer_id)
 
 void MainWindow::on_act_receipts_triggered()
 {
-    openTabLists(false, "Надходження");
+    openTabLists(false, "Усі надходження");
 }
 
 void MainWindow::on_act_customers_triggered()
@@ -113,7 +113,7 @@ void MainWindow::on_act_sellers_triggered()
 void MainWindow::on_act_goods_triggered()
 {
     Products *tab = new Products(this);
-    ui->tabWidget->addTab(tab, QIcon(":/icons/goods.ico"), "Товари");
+    ui->tabWidget->addTab(tab, QIcon(":/icons/goods.ico"), "Склад товарів");
     ui->tabWidget->setCurrentWidget(tab);
 }
 

@@ -15,6 +15,8 @@ public:
     explicit AddProduct(QWidget *parent = nullptr);
     ~AddProduct();
 
+    void setCodeToLineEdit(QString code);
+
 private slots:
     void on_btn_add_clicked();
 
