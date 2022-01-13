@@ -8,6 +8,8 @@
 #include "dialogs/findproduct.h"
 #include "dialogs/loadsupplierpricelist.h"
 
+#include "widgets/records.h"
+
 Products::Products(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Products)
@@ -34,15 +36,18 @@ Products::Products(QWidget *parent) :
 
     //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
-    {
-        if (i == 5)
-            ui->tableView->setColumnWidth(i, 700);
-        else if (i == 2 || i == 3 || i == 4)
-            ui->tableView->setColumnWidth(i, 200);
-        else
-            ui->tableView->setColumnWidth(i, 150);
-    }
+
+    ui->tableView->setItemDelegateForColumn(7, new NumberFormatDelegate(this));
+
+//    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
+//    {
+//        if (i == 5)
+//            ui->tableView->setColumnWidth(i, 700);
+//        else if (i == 2 || i == 3 || i == 4)
+//            ui->tableView->setColumnWidth(i, 200);
+//        else
+//            ui->tableView->setColumnWidth(i, 150);
+//    }
 }
 
 Products::~Products()
@@ -111,5 +116,25 @@ void Products::on_btn_find_clicked()
         model->setFilter(newModelFilter);
     }
     delete dlg;
+}
+
+void Products::resizeEvent(QResizeEvent *event)
+{
+    const int columnsCount = ui->tableView->model()->columnCount();
+    const int PARENT_WIDTH = this->width();
+    const int NAME_COLUMN_WIDTH = PARENT_WIDTH / 3;
+    const int CODES_COLUMN_WIDTH = PARENT_WIDTH / 8;
+    const int OTHER_COLUMNS_WIDTH = (PARENT_WIDTH - NAME_COLUMN_WIDTH - CODES_COLUMN_WIDTH * 3) / (columnsCount - 4);
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i)
+    {
+        if (i == 5)
+            ui->tableView->setColumnWidth(i, NAME_COLUMN_WIDTH);
+        else if (i == 2 || i == 3 || i == 4)
+            ui->tableView->setColumnWidth(i, CODES_COLUMN_WIDTH);
+        else
+            ui->tableView->setColumnWidth(i, OTHER_COLUMNS_WIDTH);
+    }
+
+    QWidget::resizeEvent(event);
 }
 

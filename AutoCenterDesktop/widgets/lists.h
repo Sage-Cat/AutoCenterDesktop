@@ -51,6 +51,10 @@ private:
     Ui::Lists *ui;
     bool isSale;
     QSqlTableModel *model;
+
+    // QWidget interface
+protected:
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // LISTS_H

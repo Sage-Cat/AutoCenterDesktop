@@ -47,16 +47,17 @@ Records::Records(QWidget* parent, int list_id)
     ui->tableView->setItemDelegateForColumn(8, new NumberFormatDelegate(this));
     ui->tableView->setItemDelegateForColumn(9, new NumberFormatDelegate(this));
 
-    //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
-        if (i == NAME_COLUMN_INDEX)
-            ui->tableView->setColumnWidth(i, 800);
-        else if (i == CODE_COLUMN_INDEX)
-            ui->tableView->setColumnWidth(i, 300);
-        else
-            ui->tableView->setColumnWidth(i, 150);
-    }
+//    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
+//        if (i == NAME_COLUMN_INDEX)
+//            ui->tableView->setColumnWidth(i, 800);
+//        else if (i == CODE_COLUMN_INDEX)
+//            ui->tableView->setColumnWidth(i, 300);
+//        else
+//            ui->tableView->setColumnWidth(i, 150);
+//    }
 
     // Comboboxes
     initComboboxes();
@@ -70,6 +71,25 @@ Records::Records(QWidget* parent, int list_id)
 Records::~Records()
 {
     delete ui;
+}
+
+void Records::resizeEvent(QResizeEvent *event)
+{
+    const int columnsCount = ui->tableView->model()->columnCount();
+    const int PARENT_WIDTH = this->width();
+    const int NAME_COLUMN_WIDTH = PARENT_WIDTH / 2.5;
+    const int CODE_COLUMN_WIDTH = PARENT_WIDTH / 6;
+    const int OTHER_COLUMNS_WIDTH = (PARENT_WIDTH - NAME_COLUMN_WIDTH - CODE_COLUMN_WIDTH) / (columnsCount - 2) * 1.5;
+    for (int i = 0; i < columnsCount; ++i) {
+        if (i == NAME_COLUMN_INDEX)
+            ui->tableView->setColumnWidth(i, NAME_COLUMN_WIDTH);
+        else if (i == CODE_COLUMN_INDEX)
+            ui->tableView->setColumnWidth(i, CODE_COLUMN_WIDTH);
+        else
+            ui->tableView->setColumnWidth(i, OTHER_COLUMNS_WIDTH);
+    }
+
+    QWidget::resizeEvent(event);
 }
 
 void Records::on_comboBox_Customer_currentIndexChanged(int index)
@@ -288,7 +308,7 @@ void Records::updateView()
     float sum {};
     if (qry.next())
         sum = qry.value(0).toFloat();
-    ui->line_sum->setText(QString::number(sum, 'G'));
+    ui->line_sum->setText(QString::number(sum, 'f', 2));
 }
 
 void Records::initDateTimeAndPrintButtons()

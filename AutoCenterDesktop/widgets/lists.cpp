@@ -1,9 +1,9 @@
 #include "lists.h"
 #include "ui_lists.h"
 
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlTableModel>
-#include <QSqlError>
 
 #include <QMessageBox>
 
@@ -61,14 +61,14 @@ Lists::Lists(QWidget* parent, bool isSale)
 
     //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
-        if (i == 5 || i == 6)
-            ui->tableView->setColumnWidth(i, 600);
-        else if (i == 2 || i == 4)
-            ui->tableView->setColumnWidth(i, 300);
-        else
-            ui->tableView->setColumnWidth(i, 150);
-    }
+//        for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
+//            if (i == 5 || i == 6)
+//                ui->tableView->setColumnWidth(i, 600);
+//            else if (i == 2 || i == 4)
+//                ui->tableView->setColumnWidth(i, 300);
+//            else
+//                ui->tableView->setColumnWidth(i, 150);
+//        }
 
     setModelFilter(FilterFlag::ShowAll);
 }
@@ -115,8 +115,7 @@ void Lists::on_btn_del_clicked()
         auto result = QMessageBox::warning(this, "Попередження", "Ви впевненні, що хочете видалити запис " + selectedRows.front().siblingAtColumn(4).data(Qt::DisplayRole).toString() + "?",
             QMessageBox::Yes | QMessageBox::No);
 
-        if (result == QMessageBox::Yes)
-        {
+        if (result == QMessageBox::Yes) {
             const QString id = selectedRows.front().data(Qt::DisplayRole).toString();
             QSqlQuery qry;
             qry.exec("PRAGMA foreign_keys=ON");
@@ -154,6 +153,25 @@ void Lists::on_btn_load_clicked()
 void Lists::updateView()
 {
     model->select();
+}
+
+void Lists::resizeEvent(QResizeEvent* event)
+{
+    const int columnsCount = ui->tableView->model()->columnCount();
+    const int PARENT_WIDTH = this->width();
+    const int NAMES_COLUMN_WIDTH = PARENT_WIDTH / 3.5;
+    const int DATA_COLUMN_WIDTH = PARENT_WIDTH / 6.8;
+    const int OTHER_COLUMNS_WIDTH = (PARENT_WIDTH - NAMES_COLUMN_WIDTH * 2 - DATA_COLUMN_WIDTH * 2) / (columnsCount - 4);
+    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
+        if (i == 5 || i == 6)
+            ui->tableView->setColumnWidth(i, NAMES_COLUMN_WIDTH);
+        else if (i == 2 || i == 4)
+            ui->tableView->setColumnWidth(i, DATA_COLUMN_WIDTH);
+        else
+            ui->tableView->setColumnWidth(i, OTHER_COLUMNS_WIDTH);
+    }
+
+    QWidget::resizeEvent(event);
 }
 
 void Lists::on_btn_create_clicked()

@@ -30,6 +30,10 @@ private slots:
 private:
     Ui::Products* ui;
     QSqlTableModel *model;
+
+    // QWidget interface
+protected:
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // PRODUCTS_H

@@ -29,6 +29,9 @@ public:
     explicit Records(QWidget* parent = nullptr, int list_id = 0);
     ~Records();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
     /* COMBOBOXES */
     void on_comboBox_Customer_currentIndexChanged(int index);
