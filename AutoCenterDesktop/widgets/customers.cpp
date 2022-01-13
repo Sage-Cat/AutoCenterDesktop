@@ -2,7 +2,11 @@
 #include "ui_customers.h"
 
 #include <QSqlQuery>
-#include <QSqlQueryModel>
+#include <QSqlError>
+
+#include <QDebug>
+
+#include <QSqlTableModel>
 
 Customers::Customers(QWidget *parent) :
     QWidget(parent),
@@ -16,6 +20,7 @@ Customers::Customers(QWidget *parent) :
     //qobject_cast<QSqlQueryModel *>(model)->setQuery("select * from customer_view");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->select();
+
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Ім'я")); // only organizations will have ipn
     model->setHeaderData(2, Qt::Horizontal, tr("К-сть авто"));

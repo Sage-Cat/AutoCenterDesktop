@@ -168,7 +168,6 @@ void Lists::on_btn_create_clicked()
                 "INSERT INTO list(number, type, customer_id, seller_id) "
                     "SELECT '%1', '%2', customer_id, seller_id FROM list WHERE ID='%3'";
         query_str = query_str.arg(QString::number(newNumber), listType, QString::number(list_id));
-        qDebug() << query_str;
         if (qry.exec(query_str))
         {
             // #2 Get created list's id
