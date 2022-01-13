@@ -3,6 +3,7 @@
 
 #include <QSqlQuery>
 #include <QSqlTableModel>
+#include <QSqlError>
 
 #include <QMessageBox>
 
@@ -122,6 +123,7 @@ void Lists::on_btn_del_clicked()
             QSqlQuery qry;
             qry.exec("PRAGMA foreign_keys=ON");
             qry.exec("DELETE FROM list WHERE id=" + id);
+            qDebug() << qry.lastError().text();
             model->select();
         }
     }

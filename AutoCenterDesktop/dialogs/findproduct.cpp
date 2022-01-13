@@ -11,7 +11,6 @@ FindProduct::FindProduct(QWidget *parent) :
     ui->setupUi(this);
 
     QStringList searchBy {
-        "",
         "Пошук за кодом",
         "Пошук за каталожним номером",
         "Пошук за ТНВЕД",

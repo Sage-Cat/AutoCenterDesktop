@@ -3,8 +3,10 @@
 
 #include <QSqlQuery>
 #include <QSqlTableModel>
+#include <QSqlError>
 
 #include <QMessageBox>
+#include <QDebug>
 #include <QVector>
 
 #include "global.h"
@@ -90,7 +92,7 @@ void Records::on_comboBox_Seller_currentIndexChanged(int index)
 void Records::on_btn_add_clicked()
 {
     QSqlQuery qry;
-    qry.exec("INSERT INTO record(count, price, list_id) VALUES(1, '0.0', " + QString::number(list_id) + ")");
+    qry.exec("INSERT INTO record(count, price, list_id) VALUES(0, '0.0', " + QString::number(list_id) + ")");
 
     updateView();
 }
@@ -124,10 +126,10 @@ void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
             handleProductCodeChange(data, record_id);
         } break;
         case 8: {
-            handleSimpleCellChange("price", data, record_id);
+            handlePriceCellChange(data, record_id);
         } break;
         case 6: {
-            handleSimpleCellChange("count", data, record_id);
+            handleCountCellChange(data, record_id);
         } break;
         }
     }
@@ -139,11 +141,17 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
 {
     // #1 Find product_id by code
     QSqlQuery qry;
-    qry.exec("SELECT id, price FROM product WHERE code='" + data + "'");
+    qry.exec("SELECT id, purchase_price FROM product WHERE code='" + data + "'");
     if (qry.next()) {
         // #2 Change product_id cell and price
+
+        // SPECIAL for price +30% if not receipt
+        float price = qry.value(1).toFloat();
+        if (docType != DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
+            price *= 1.3;
+
         handleSimpleCellChange("product_id", qry.value(0).toString(), record_id);
-        handleSimpleCellChange("price", qry.value(1).toString(), record_id);
+        handleSimpleCellChange("price", QString::number(price, 'f', 2), record_id);
     } else {
         auto result = QMessageBox::information(this, "Повідомляю",
             "Товару з даним кодом у базі данних не знайдено.\n"
@@ -157,6 +165,67 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
             if (dlg->exec() == QDialog::Accepted)
                 handleProductCodeChange(data, record_id);
         }
+    }
+}
+
+void Records::handleCountCellChange(const QString &data, const QString &record_id)
+{
+    // get previos value
+    QSqlQuery qry;
+    qry.exec("SELECT count, product_id FROM record WHERE id=" + record_id);
+    bool isNumber { true };
+    data.toInt(&isNumber);
+    if (qry.next() && isNumber)
+    {
+        // 5(new) - 3(old) -> amount became bigger on 2
+        const int difference = data.toInt() - qry.value(0).toInt();
+
+        const QString product_id = qry.value(1).toString();
+        qDebug() << product_id;
+        if (product_id.isEmpty())
+        {
+            QMessageBox::warning(this, "Попередження", "Встановіть будь-ласка спочатку код товару.", QMessageBox::Ok);
+            return;
+        }
+
+        qry.exec("SELECT amount FROM product WHERE id=" + product_id);
+        if (qry.next() && difference != 0)
+        {
+            int newAmount {};
+            if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
+                newAmount = qry.value(0).toInt() + difference; // plus goods to storage
+            else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna]
+                     || docType == DOC_TYPES_NAMES[DOC_TYPES::Tovarniy_chek])
+                newAmount = qry.value(0).toInt() - difference; // minus goods
+
+            if (qry.exec("UPDATE product SET amount=" + QString::number(newAmount) + " WHERE id=" + product_id))
+                handleSimpleCellChange("count", data, record_id);
+            else
+                QMessageBox::critical(this, "Помилка", "Не вдалося змінити к-сть товару на складі. \nLog: " +
+                                      qry.lastError().text(), QMessageBox::Ok);
+        }
+    }
+}
+
+void Records::handlePriceCellChange(const QString &data, const QString &record_id)
+{
+    bool isNumber { true };
+    data.toFloat(&isNumber);
+    if (isNumber)
+    {
+        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
+        {
+            QSqlQuery qry;
+            qry.exec("SELECT product_id FROM record WHERE id=" + record_id);
+            if (qry.next())
+            {
+                const QString product_id = qry.value(0).toString();
+                if (!qry.exec("UPDATE product SET purchase_price='" + data + "' WHERE id=" + product_id))
+                    QMessageBox::critical(this, "Помилка", "Не вдалося встановити ціну закупки. \nLog: " +
+                                          qry.lastError().text(), QMessageBox::Ok);
+            }
+        }
+        handleSimpleCellChange("price", data, record_id);
     }
 }
 
@@ -249,9 +318,6 @@ void Records::initComboboxes()
     QSqlQuery qry;
     qry.exec("SELECT id, name FROM customer");
     int index {};
-    customer_index_to_id[index] = NULL_STR; // for empty (default)
-    ui->comboBox_Customer->insertItem(index, "Кінцевий покупець");
-    index++;
     while (qry.next()) {
         customer_index_to_id[index] = qry.value(0).toString() /*id*/;
         ui->comboBox_Customer->insertItem(

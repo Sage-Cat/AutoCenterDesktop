@@ -54,7 +54,7 @@ void Products::insertProductToDb(QString code, QString catalog, QString tnved, Q
 {
     QSqlQuery qry;
     QString query_str =
-            "INSERT INTO product(code, catalog, tnved, name, unit, price) "
+            "INSERT INTO product(code, catalog, tnved, name, unit, purchase_price) "
                 "VALUES('%1', '%2', '%3', '%4', '%5', '%6')";
     qry.exec(query_str.arg(code, catalog, tnved, name, unit, price));
 }
