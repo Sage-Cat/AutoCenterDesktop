@@ -988,7 +988,6 @@ QTabWidget::tab-bar {
     <property name="title">
      <string>Менеджмент</string>
     </property>
-    <addaction name="act_loadPriceList"/>
     <addaction name="act_inventory"/>
     <addaction name="separator"/>
     <addaction name="act_customers"/>
@@ -1004,25 +1003,12 @@ QTabWidget::tab-bar {
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="act_users"/>
     <addaction name="separator"/>
     <addaction name="act_exit"/>
-   </widget>
-   <widget class="QMenu" name="menu_analytics">
-    <property name="font">
-     <font>
-      <pointsize>16</pointsize>
-     </font>
-    </property>
-    <property name="title">
-     <string>Аналітика</string>
-    </property>
-    <addaction name="act_statistics"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_work"/>
    <addaction name="menu_management"/>
-   <addaction name="menu_analytics"/>
   </widget>
   <action name="act_sales">
    <property name="text">

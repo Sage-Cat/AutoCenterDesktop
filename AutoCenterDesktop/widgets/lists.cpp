@@ -12,8 +12,6 @@
 
 #include "global.h"
 
-#include <QDebug>
-
 /*!
  * \brief Lists::setModelFilter sets complex filter system. We need it due to number of characteristics
  * like isSale and comboboxes
@@ -123,7 +121,6 @@ void Lists::on_btn_del_clicked()
             QSqlQuery qry;
             qry.exec("PRAGMA foreign_keys=ON");
             qry.exec("DELETE FROM list WHERE id=" + id);
-            qDebug() << qry.lastError().text();
             model->select();
         }
     }

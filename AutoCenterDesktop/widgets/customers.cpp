@@ -4,8 +4,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
-#include <QDebug>
-
 #include <QSqlTableModel>
 
 Customers::Customers(QWidget *parent) :

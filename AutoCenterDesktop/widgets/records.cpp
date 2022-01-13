@@ -6,7 +6,6 @@
 #include <QSqlError>
 
 #include <QMessageBox>
-#include <QDebug>
 #include <QVector>
 
 #include "global.h"
@@ -181,7 +180,6 @@ void Records::handleCountCellChange(const QString &data, const QString &record_i
         const int difference = data.toInt() - qry.value(0).toInt();
 
         const QString product_id = qry.value(1).toString();
-        qDebug() << product_id;
         if (product_id.isEmpty())
         {
             QMessageBox::warning(this, "Попередження", "Встановіть будь-ласка спочатку код товару.", QMessageBox::Ok);
