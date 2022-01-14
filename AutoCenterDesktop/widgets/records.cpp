@@ -7,6 +7,7 @@
 
 #include <QMessageBox>
 #include <QVector>
+#include <QDateTime>
 
 #include "global.h"
 #include "utils/barcodelabelprinter.h"
@@ -325,7 +326,9 @@ void Records::initDateTimeAndPrintButtons()
         if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya))
             ui->btn_print_document->setDisabled(true);
     }
-    ui->line_datetime->setText(datetime);
+
+    QDateTime formated = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss"); // from SQLite format
+    ui->line_datetime->setDateTime(formated);
 }
 
 void Records::initComboboxes()
@@ -379,3 +382,10 @@ QString Records::getFromDBCurrentListColumn(QString column_name)
         res = qry.value(0).toString();
     return res;
 }
+
+void Records::on_line_datetime_dateTimeChanged(const QDateTime &dateTime)
+{
+    QSqlQuery qry;
+    qry.exec("UPDATE list SET datetime='" + dateTime.toString("yyyy-MM-dd hh:mm:ss") + "' WHERE id=" + QString::number(list_id));
+}
+

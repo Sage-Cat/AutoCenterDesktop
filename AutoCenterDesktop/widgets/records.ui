@@ -151,28 +151,24 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="line_datetime">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="font">
-            <font>
-             <family>DejaVu Sans</family>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color : white; 
-margin-left: 5px; 
-margin-right: 5px;</string>
-           </property>
-           <property name="text">
-            <string>дата</string>
-           </property>
-          </widget>
-         </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QDateTimeEdit" name="line_datetime">
+         <property name="dateTime">
+          <datetime>
+           <hour>0</hour>
+           <minute>0</minute>
+           <second>0</second>
+           <year>2000</year>
+           <month>1</month>
+           <day>1</day>
+          </datetime>
+         </property>
+         <property name="displayFormat">
+          <string>M/d/yy h:mm:ss</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

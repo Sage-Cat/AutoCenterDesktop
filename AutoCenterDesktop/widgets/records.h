@@ -60,6 +60,8 @@ private slots:
     /* CUSTOM */
     QString getFromDBCurrentListColumn(QString column_name);
 
+    void on_line_datetime_dateTimeChanged(const QDateTime &dateTime);
+
 signals:
     void listDataChanged();
 
