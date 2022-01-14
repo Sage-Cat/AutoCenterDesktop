@@ -16,5 +16,8 @@
         <file>icons/work.png</file>
         <file>db_init.sql</file>
         <file>pdv_rahunok.htm</file>
+        <file>без_pdv_накладна.htm</file>
+        <file>без_pdv_рахунок.htm</file>
+        <file>без_pdv_чек.htm</file>
     </qresource>
 </RCC>

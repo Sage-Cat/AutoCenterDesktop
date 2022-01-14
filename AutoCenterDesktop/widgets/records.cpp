@@ -121,12 +121,14 @@ void Records::on_btn_del_clicked()
     const auto selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
     if (selectedIndexes.isEmpty())
         return;
-    const QString record_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toString();
 
-    QSqlQuery qry;
-    qry.exec("PRAGMA foreign_keys=ON");
-    qry.exec("DELETE FROM record WHERE id=" + record_id);
-
+    for (int i = 0; i < selectedIndexes.size(); ++i)
+    {
+        const QString record_id = selectedIndexes.at(i).siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toString();
+        QSqlQuery qry;
+        qry.exec("PRAGMA foreign_keys=ON");
+        qry.exec("DELETE FROM record WHERE id=" + record_id);
+    }
     updateView();
 }
 

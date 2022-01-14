@@ -49,10 +49,13 @@ void Cars::on_btn_del_clicked()
     QSqlQuery qry;
     if (!selected_indexes.isEmpty())
     {
-        qry.exec("PRAGMA foreign_keys=ON");
-        qry.exec("DELETE FROM car WHERE id=" + selected_indexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
-                 .data(Qt::DisplayRole).toString()
-                 );
+        for (int i = 0; i < selected_indexes.size(); ++i)
+        {
+            qry.exec("PRAGMA foreign_keys=ON");
+            qry.exec("DELETE FROM car WHERE id=" + selected_indexes.at(i).siblingAtColumn(ID_COLUMN_INDEX)
+                     .data(Qt::DisplayRole).toString()
+                     );
+        }
     }
 
     model->select();

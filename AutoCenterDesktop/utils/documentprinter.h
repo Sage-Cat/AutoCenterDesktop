@@ -32,6 +32,7 @@ public:
 private:
     void printHtmlForm(const QString& html);
     QString convertPriceInWords(float sum);
+    QString generateTableDataAndCalculateAllSum(const QSqlTableModel* model, float &all_sum);
 
     const QString TABLE_ROW = "<TR CLASS=R0>"
                               "<TD><SPAN></SPAN></TD>"

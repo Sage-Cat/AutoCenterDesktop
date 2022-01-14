@@ -23,7 +23,7 @@ Products::Products(QWidget *parent) :
     model->setFilter("ID=NULL");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("К-сть на складі"));
+    model->setHeaderData(1, Qt::Horizontal, tr("На складі"));
     model->setHeaderData(2, Qt::Horizontal, tr("Код"));
     model->setHeaderData(3, Qt::Horizontal, tr("Каталог"));
     model->setHeaderData(4, Qt::Horizontal, tr("ТНВЕД"));
@@ -83,12 +83,12 @@ void Products::on_btn_del_clicked()
     const auto selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
     if (selectedIndexes.isEmpty())
         return;
-    const QString record_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
+    const QString product_id = selectedIndexes.at(0).siblingAtColumn(ID_COLUMN_INDEX)
             .data(Qt::DisplayRole).toString();
 
     QSqlQuery qry;
     qry.exec("PRAGMA foreign_keys=ON");
-    qry.exec("DELETE FROM record WHERE id=" + record_id);
+    qry.exec("DELETE FROM product WHERE id=" + product_id);
 
     model->setFilter("ID=NULL");
     model->select();

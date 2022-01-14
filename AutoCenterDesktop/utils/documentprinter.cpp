@@ -31,27 +31,12 @@ void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& custo
     }
 
     // Get RR1, RR2
-    QString RR1 = seller.iban.mid(0, 10);
-    QString RR2 = seller.iban.mid(10);
+    const QString RR1 = seller.iban.mid(0, 10);
+    const QString RR2 = seller.iban.mid(10);
 
     // Creating data and calculating all sum
-    QString data {};
     float all_sum {};
-    for (int i = 0; i < model->rowCount(); ++i) {
-        const float sum = model->index(i, SUM_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
-        all_sum += sum;
-
-        QString row = TABLE_ROW;
-        row.replace(":Number", QString::number(i + 1));
-        row.replace(":Code", model->index(i, CODE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Name", model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Count", model->index(i, COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Unit", model->index(i, UNIT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Price", model->index(i, PRICE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Sum", QString::number(sum, 'G'));
-
-        data += row + "\n";
-    }
+    const QString data { generateTableDataAndCalculateAllSum(model, all_sum) };
 
     // Calculating pdv
     const float pdv = all_sum * 0.2;
@@ -72,7 +57,7 @@ void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& custo
     html_template.replace(":RR1", RR1);
     html_template.replace(":RR2", RR2);
     html_template.replace(":RRFull", seller.iban);
-    html_template.replace(":Datetime", datetime.mid(0, 10));
+    html_template.replace(":Date", datetime.mid(0, 10));
     html_template.replace(":ListNumber", listnumber);
     html_template.replace(":IPN", seller.ipn);
     html_template.replace(":Bank", seller.bank);
@@ -473,4 +458,25 @@ QString DocumentPrinter::convertPriceInWords(float sum)
     }
 
     return part_one + part_two;
+}
+
+QString DocumentPrinter::generateTableDataAndCalculateAllSum(const QSqlTableModel *model, float &all_sum)
+{
+    QString data {};
+    for (int i = 0; i < model->rowCount(); ++i) {
+        const float sum = model->index(i, SUM_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
+        all_sum += sum;
+
+        QString row = TABLE_ROW;
+        row.replace(":Number", QString::number(i + 1));
+        row.replace(":Code", model->index(i, CODE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Name", model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Count", model->index(i, COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Unit", model->index(i, UNIT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Price", model->index(i, PRICE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Sum", QString::number(sum, 'G'));
+
+        data += row + "\n";
+    }
+
 }
