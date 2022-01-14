@@ -12,11 +12,23 @@ void BarcodeLabelPrinter::printLabels(const QVector<Label>& labels)
     if(!askPrinterSelect(printer))
         return;
 
+    printer.setPaperSize(QSizeF(41, 25), QPrinter::Millimeter);
+
     for (const Label& label : labels) {
         Code128Item* m_Barcode = createCode128Label(label);
 
-        QPainter painter(&printer);
+        QPainter painter;
+        painter.begin(&printer);
         painter.setFont(QFont("Helvetica", 8));
+
+        double xscale = printer.pageRect().width()/double(200);
+        double yscale = printer.pageRect().height()/double(80);
+        double scale = qMin(xscale, yscale);
+
+        painter.translate(printer.paperRect().x() + printer.pageRect().width()/2,
+                                    printer.paperRect().y() + printer.pageRect().height()/2);
+        painter.scale(scale, scale);
+        painter.translate(-200/2, -80/2);
 
         for (int i = 0; i < label.timesToPrint; ++i)
             m_Barcode->paint(&painter, nullptr, nullptr);
@@ -29,6 +41,7 @@ void BarcodeLabelPrinter::printLabels(const QVector<Label>& labels)
 //        for (int i = 0; i < label.timesToPrint; ++i)
 //            painter.drawPixmap(0, 0, pix);
 
+        painter.end();
         delete m_Barcode;
     }
 }
