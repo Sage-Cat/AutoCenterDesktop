@@ -14,7 +14,7 @@ Code128Item::Code128Item() :
 void Code128Item::setText(const QString &barcodeText, const QString &labelText)
 {
     m_Code = Code128::encode(barcodeText);
-    m_Text = labelText;
+    m_Text = barcodeText + "\n" + labelText;
 
     m_CodeLength = 0;
     for (int i=0;i<m_Code.length();i++)
@@ -81,7 +81,7 @@ void Code128Item::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
         if ( i % 2 == 0 )
         {
-            QRectF bar(left, 0, width, m_Height - fontHeight * 3);
+            QRectF bar(left, 0, width, m_Height - fontHeight * 4);
             painter->fillRect(bar, Qt::SolidPattern);
         }
 
@@ -90,7 +90,7 @@ void Code128Item::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
     if ( m_TextVisible )
     {
-        QRectF box(0, m_Height - fontHeight * 3, left, fontHeight * 3);
+        QRectF box(0, m_Height - fontHeight * 4, left, fontHeight * 4);
         painter->drawText(box, m_Text, Qt::AlignHCenter | Qt::AlignTop);
     }
 }
