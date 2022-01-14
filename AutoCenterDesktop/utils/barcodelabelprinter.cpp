@@ -4,7 +4,10 @@
 
 #include <QPainter>
 #include <QPrintDialog>
+#include <QPrintEngine>
 #include <QPrinter>
+
+#include <QFont>
 
 void BarcodeLabelPrinter::printLabels(const QVector<Label>& labels)
 {
@@ -14,21 +17,26 @@ void BarcodeLabelPrinter::printLabels(const QVector<Label>& labels)
 
     printer.setPaperSize(QSizeF(41, 25), QPrinter::Millimeter);
 
+    QFont font("Helvetica", 8);
+    font.setWeight(QFont::Bold);
+
+    double xscale = printer.pageRect().width()/double(200);
+    double yscale = printer.pageRect().height()/double(80);
+    double scale = qMin(xscale, yscale);
+
+    QPainter painter;
+    painter.begin(&printer);
+    painter.setFont(font);
+
+    painter.translate(printer.paperRect().x() + printer.pageRect().width()/2,
+                                printer.paperRect().y() + printer.pageRect().height()/2);
+    painter.scale(scale, scale);
+    painter.translate(-200/2, -80/2);
+
+    printer.setPageMargins(5, 2, 0, 0, QPrinter::Millimeter);
+
     for (const Label& label : labels) {
         Code128Item* m_Barcode = createCode128Label(label);
-
-        QPainter painter;
-        painter.begin(&printer);
-        painter.setFont(QFont("Helvetica", 8));
-
-        double xscale = printer.pageRect().width()/double(200);
-        double yscale = printer.pageRect().height()/double(80);
-        double scale = qMin(xscale, yscale);
-
-        painter.translate(printer.paperRect().x() + printer.pageRect().width()/2,
-                                    printer.paperRect().y() + printer.pageRect().height()/2);
-        painter.scale(scale, scale);
-        painter.translate(-200/2, -80/2);
 
         for (int i = 0; i < label.timesToPrint; ++i)
             m_Barcode->paint(&painter, nullptr, nullptr);
