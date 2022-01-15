@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     dialogs/addproduct.cpp \
     dialogs/askforprinter.cpp \
+    dialogs/editcustomer.cpp \
     dialogs/findproduct.cpp \
     dialogs/loadsupplierpricelist.cpp \
     dialogs/setlisttype.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 HEADERS += \
     dialogs/addproduct.h \
     dialogs/askforprinter.h \
+    dialogs/editcustomer.h \
     dialogs/findproduct.h \
     dialogs/loadsupplierpricelist.h \
     dialogs/setlisttype.h \
@@ -53,6 +55,7 @@ HEADERS += \
 FORMS += \
     dialogs/addproduct.ui \
     dialogs/askforprinter.ui \
+    dialogs/editcustomer.ui \
     dialogs/findproduct.ui \
     dialogs/loadsupplierpricelist.ui \
     dialogs/setlisttype.ui \

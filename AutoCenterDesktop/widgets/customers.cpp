@@ -3,8 +3,11 @@
 
 #include <QSqlQuery>
 #include <QSqlError>
-
 #include <QSqlTableModel>
+
+#include <QMessageBox>
+
+#include "dialogs/editcustomer.h"
 
 Customers::Customers(QWidget *parent) :
     QWidget(parent),
@@ -22,16 +25,19 @@ Customers::Customers(QWidget *parent) :
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Ім'я")); // only organizations will have ipn
     model->setHeaderData(2, Qt::Horizontal, tr("К-сть авто"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Адреса"));
-    model->setHeaderData(4, Qt::Horizontal, tr("Номер"));
-    model->setHeaderData(5, Qt::Horizontal, tr("Ел.пошта"));
-    model->setHeaderData(6, Qt::Horizontal, tr("ІБАН"));
-    model->setHeaderData(7, Qt::Horizontal, tr("Банк"));
-    model->setHeaderData(8, Qt::Horizontal, tr("ЄДРПОУ"));
-    model->setHeaderData(9, Qt::Horizontal, tr("ІПН"));
+//    model->setHeaderData(3, Qt::Horizontal, tr("Адреса"));
+//    model->setHeaderData(4, Qt::Horizontal, tr("Номер"));
+//    model->setHeaderData(5, Qt::Horizontal, tr("Ел.пошта"));
+//    model->setHeaderData(6, Qt::Horizontal, tr("ІБАН"));
+//    model->setHeaderData(7, Qt::Horizontal, tr("Банк"));
+//    model->setHeaderData(8, Qt::Horizontal, tr("ЄДРПОУ"));
+//    model->setHeaderData(9, Qt::Horizontal, tr("ІПН"));
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
+    for (int i = 3; i < model->columnCount(); ++i)
+        ui->tableView->setColumnHidden(i, true);
+
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     connect(model, &QSqlTableModel::dataChanged, this, &Customers::handleDataChange);
@@ -56,13 +62,17 @@ void Customers::on_btn_del_clicked()
     QSqlQuery qry;
     if (!selected_indexes.isEmpty())
     {
-        for (int i = 0; i < selected_indexes.size(); ++i)
-        {
-            qry.exec("PRAGMA foreign_keys=ON");
-            qry.exec("DELETE FROM customer WHERE id=" + selected_indexes.at(i).siblingAtColumn(ID_COLUMN_INDEX)
-                     .data(Qt::DisplayRole).toString()
-                     );
-        }
+        auto result = QMessageBox::warning(this, "Попередження", "Ви впевненні, що хочете видалити обраних клієнтів з бази?\n"
+                            "Усі дані та історія покупок також будуть очищені! ", QMessageBox::Yes | QMessageBox::No);
+
+        if (result == QMessageBox::Yes)
+            for (int i = 0; i < selected_indexes.size(); ++i)
+            {
+                qry.exec("PRAGMA foreign_keys=ON");
+                qry.exec("DELETE FROM customer WHERE id=" + selected_indexes.at(i).siblingAtColumn(ID_COLUMN_INDEX)
+                         .data(Qt::DisplayRole).toString()
+                         );
+            }
     }
 
     updateView();
@@ -135,5 +145,13 @@ void Customers::handleSimpleCellChange(const QString &columnName, const QString 
 void Customers::updateView()
 {
     model->select();
+}
+
+
+void Customers::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    EditCustomer *dlg = new EditCustomer(this, model, index.row());
+    if (dlg->exec() == QDialog::Accepted)
+        updateView();
 }
 

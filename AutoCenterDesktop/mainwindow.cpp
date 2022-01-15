@@ -82,7 +82,7 @@ void MainWindow::openTabCars(int customer_id)
     if (sender_tab)
         connect(tab, &Cars::carsCountChanged, sender_tab, &Customers::updateView);
 
-    ui->tabWidget->addTab(tab, QIcon(":/icons/info.png"), "Інформація");
+    ui->tabWidget->addTab(tab, QIcon(":/icons/car.png"), "Автомобілі");
     ui->tabWidget->setCurrentWidget(tab);
 }
 

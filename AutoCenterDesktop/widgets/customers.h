@@ -28,6 +28,8 @@ private slots:
     void handleDataChange(const QModelIndex& topLeft, const QModelIndex&);
     void handleSimpleCellChange(const QString& columnName, const QString &data, const QString &customer_id);
 
+    void on_tableView_doubleClicked(const QModelIndex &index);
+
 public slots:
     void updateView();
 

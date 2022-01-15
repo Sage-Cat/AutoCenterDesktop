@@ -29,6 +29,8 @@ Info::Info(QWidget *parent, int id) :
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
+    ui->tableView->setColumnHidden(3, true); // hide Catalog
+    ui->tableView->setColumnHidden(4, true); // hide TNVED
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
