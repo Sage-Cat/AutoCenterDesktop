@@ -138,7 +138,7 @@ void Customers::handleDataChange(const QModelIndex &topLeft, const QModelIndex &
 void Customers::handleSimpleCellChange(const QString &columnName, const QString &data, const QString &customer_id)
 {
     QSqlQuery qry;
-    const QString query_str = "UPDATE customer SET %1=%2 WHERE id=%3";
+    const QString query_str = "UPDATE customer SET %1='%2' WHERE id='%3'";
     qry.exec(query_str.arg(columnName, data, customer_id));
 }
 
@@ -151,7 +151,6 @@ void Customers::updateView()
 void Customers::on_tableView_doubleClicked(const QModelIndex &index)
 {
     EditCustomer *dlg = new EditCustomer(this, model, index.row());
-    if (dlg->exec() == QDialog::Accepted)
-        updateView();
+    dlg->exec();
 }
 

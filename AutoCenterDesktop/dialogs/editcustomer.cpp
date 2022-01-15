@@ -52,7 +52,11 @@ EditCustomer::~EditCustomer()
 
 void EditCustomer::on_btn_accept_clicked()
 {
-
+    for (int i = 0; i < data_indexes.size(); ++i)
+    customersModel->setData(
+                    customersModel->index(selected_row, data_indexes[i]),
+                    ui->tableWidget->item(i, 0)->text()
+                    );
 
     this->accept();
 }
