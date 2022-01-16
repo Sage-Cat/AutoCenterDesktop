@@ -104,7 +104,6 @@ void MainWindow::on_act_customers_triggered()
 void MainWindow::on_act_sellers_triggered()
 {
     Sellers *tab = new Sellers(this);
-    // TODO: connet to method for info widget opening
 
     ui->tabWidget->addTab(tab, QIcon(":/icons/seller.png"), "Продавці");
     ui->tabWidget->setCurrentWidget(tab);

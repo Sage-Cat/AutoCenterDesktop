@@ -27,12 +27,19 @@ class DocumentPrinter {
 public:
     DocumentPrinter();
     void printPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
-                         const QString &datetime, const QString &listnumber);
+        const QString& date, const QString& listnumber);
+    void printBezPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+        const QString& date, const QString& listnumber);
+    void printBezPdvNakladna(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+        const QString& date, const QString& listnumber);
+    void printBezPdvChek(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+        const QString& date, const QString& listnumber);
 
 private:
     void printHtmlForm(const QString& html);
     QString convertPriceInWords(float sum);
-    QString generateTableDataAndCalculateAllSum(const QSqlTableModel* model, float &all_sum);
+    QString generateTableDataAndCalculateAllSum(const QSqlTableModel* model, float& all_sum);
+    QString generateTableDataAndCalculateAllSumForChek(const QSqlTableModel* model, float& all_sum);
 
     const QString TABLE_ROW = "<TR CLASS=R0>"
                               "<TD><SPAN></SPAN></TD>"
@@ -46,6 +53,18 @@ private:
                               "<TD><SPAN></SPAN></TD>"
                               "<TD></TD>"
                               "</TR>";
+
+    const QString TABLE_ROW_FOR_CHECK = "<TR CLASS=R4>"
+                                        "<TD><SPAN></SPAN></TD>"
+                                        "<TD CLASS=\"R4C1\" COLSPAN=2>:Code</TD>"
+                                        "<TD CLASS=\"R4C3\" COLSPAN=3>:Name</TD>"
+                                        "<TD CLASS=\"R4C6\">:Unit</TD>"
+                                        "<TD CLASS=\"R4C6\">:Count</TD>"
+                                        "<TD CLASS=\"R4C6\">:Price</TD>"
+                                        "<TD CLASS=\"R4C6\">:Sum</TD>"
+                                        "<TD><SPAN></SPAN></TD>"
+                                        "<TD></TD>"
+                                        "</TR>";
 };
 
 #endif // DOCUMENTPRINTER_H

@@ -12,6 +12,7 @@ SOURCES += \
     dialogs/addproduct.cpp \
     dialogs/askforprinter.cpp \
     dialogs/editcustomer.cpp \
+    dialogs/editseller.cpp \
     dialogs/findproduct.cpp \
     dialogs/loadsupplierpricelist.cpp \
     dialogs/setlisttype.cpp \
@@ -34,6 +35,7 @@ HEADERS += \
     dialogs/addproduct.h \
     dialogs/askforprinter.h \
     dialogs/editcustomer.h \
+    dialogs/editseller.h \
     dialogs/findproduct.h \
     dialogs/loadsupplierpricelist.h \
     dialogs/setlisttype.h \
@@ -56,6 +58,7 @@ FORMS += \
     dialogs/addproduct.ui \
     dialogs/askforprinter.ui \
     dialogs/editcustomer.ui \
+    dialogs/editseller.ui \
     dialogs/findproduct.ui \
     dialogs/loadsupplierpricelist.ui \
     dialogs/setlisttype.ui \

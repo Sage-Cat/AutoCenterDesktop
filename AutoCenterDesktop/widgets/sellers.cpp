@@ -4,6 +4,10 @@
 #include <QSqlTableModel>
 #include <QSqlQuery>
 
+#include <QComboBox>
+
+#include "dialogs/editseller.h"
+
 Sellers::Sellers(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Sellers)
@@ -14,7 +18,7 @@ Sellers::Sellers(QWidget *parent) :
     model = new QSqlTableModel();
     model->setTable("seller");
     model->setEditStrategy(QSqlTableModel::OnFieldChange);
-    model->select();
+    updateView();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Ім'я")); // only organizations will have ipn
     model->setHeaderData(2, Qt::Horizontal, tr("ІБАН"));
@@ -23,9 +27,17 @@ Sellers::Sellers(QWidget *parent) :
     model->setHeaderData(5, Qt::Horizontal, tr("ІПН"));
     model->setHeaderData(6, Qt::Horizontal, tr("Адреса"));
     model->setHeaderData(7, Qt::Horizontal, tr("Номер"));
+    model->setHeaderData(8, Qt::Horizontal, tr("Платник ПДВ"));
+
+    ComboBoxItemDelegate *comboDelegate = new ComboBoxItemDelegate(this);
+    ui->tableView->setItemDelegateForColumn(8,comboDelegate);
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
+    ui->tableView->setColumnHidden(3, true);
+    ui->tableView->setColumnHidden(4, true);
+    ui->tableView->setColumnHidden(5, true);
+    ui->tableView->setColumnHidden(6, true);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
@@ -34,12 +46,17 @@ Sellers::~Sellers()
     delete ui;
 }
 
+void Sellers::updateView()
+{
+    model->select();
+}
+
 void Sellers::on_btn_add_clicked()
 {
     QSqlQuery qry;
     qry.exec("INSERT INTO seller(name) VALUES(NULL)");
 
-    model->select();
+    updateView();
 }
 
 void Sellers::on_btn_del_clicked()
@@ -54,13 +71,59 @@ void Sellers::on_btn_del_clicked()
                  );
     }
 
-    model->select();
+    updateView();
 }
 
-void Sellers::on_btn_info_clicked()
+
+ComboBoxItemDelegate::ComboBoxItemDelegate(QObject *parent)
+    : QStyledItemDelegate(parent)
 {
-    const auto selected_rows = ui->tableView->selectionModel()->selectedRows(ID_COLUMN_INDEX);
-    if (!selected_rows.isEmpty())
-        emit tabSellerInfoRequested(selected_rows.at(0).data(Qt::DisplayRole).toInt());
+}
+
+ComboBoxItemDelegate::~ComboBoxItemDelegate()
+{
+}
+
+QWidget *ComboBoxItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    // Create the combobox and populate it
+    QComboBox *cb = new QComboBox(parent);
+    cb->addItem(QStringLiteral("Ні"));
+    cb->addItem(QStringLiteral("Так"));
+    return cb;
+}
+
+void ComboBoxItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    QComboBox *cb = qobject_cast<QComboBox *>(editor);
+    Q_ASSERT(cb);
+    // get the index of the text in the combobox that matches the current value of the item
+    const QString currentText = index.data(Qt::EditRole).toString();
+    const int cbIndex = cb->findText(currentText);
+    // if it is valid, adjust the combobox
+    if (cbIndex >= 0)
+       cb->setCurrentIndex(cbIndex);
+}
+
+void ComboBoxItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QComboBox *cb = qobject_cast<QComboBox *>(editor);
+    Q_ASSERT(cb);
+    model->setData(index, cb->currentText() == "Так" ? true : false, Qt::EditRole);
+}
+
+QString ComboBoxItemDelegate::displayText(const QVariant &value, const QLocale &locale) const
+{
+    return value.toBool() ? "Так" : "Ні";
+}
+
+void Sellers::on_btn_edit_clicked()
+{
+    const auto selected_indexes = ui->tableView->selectionModel()->selectedIndexes();
+    if (!selected_indexes.isEmpty())
+    {
+        EditSeller *dlg = new EditSeller(this, model, selected_indexes.front().row());
+        dlg->exec();
+    }
 }
 

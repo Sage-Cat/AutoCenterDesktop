@@ -283,7 +283,7 @@ void Records::on_btn_print_document_clicked()
         return;
     const QString listNumber = qry.value(0).toString();
 
-    qry.exec("SELECT name, iban, bank, edrpoy, number, ipn FROM seller WHERE id=" + seller_index_to_id[ui->comboBox_Seller->currentIndex()]);
+    qry.exec("SELECT name, iban, bank, edrpoy, number, ipn, isPdvPayer FROM seller WHERE id=" + seller_index_to_id[ui->comboBox_Seller->currentIndex()]);
     Seller seller;
     if (!qry.next())
         return;
@@ -294,10 +294,32 @@ void Records::on_btn_print_document_clicked()
     seller.number = qry.value(4).toString();
     seller.ipn = qry.value(5).toString();
 
+    const bool isPdv = qry.value(6).toBool();
+
     DocumentPrinter* printer = new DocumentPrinter();
-    if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
-        printer->printPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
-            ui->line_datetime->text(), listNumber);
+    if (isPdv)
+    {
+        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
+            printer->printPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
+                ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
+        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna])
+            2+3;
+        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Podatkova_nakladna])
+            1+2;
+    }
+    else // Bez pdv
+    {
+        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
+            printer->printBezPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
+                ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
+        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna])
+            printer->printBezPdvNakladna(seller, ui->comboBox_Customer->currentText(), model,
+                ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
+        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Tovarniy_chek])
+            printer->printBezPdvChek(seller, ui->comboBox_Customer->currentText(), model,
+                ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
+    }
+
 }
 
 void Records::updateView()

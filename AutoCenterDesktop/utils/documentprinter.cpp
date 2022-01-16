@@ -18,7 +18,7 @@ DocumentPrinter::DocumentPrinter()
 }
 
 void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
-                                      const QString &datetime, const QString &listnumber)
+                                      const QString &date, const QString &listnumber)
 {
     QFile x(":pdv_rahunok.htm");
     x.open(QIODevice::ReadOnly);
@@ -52,12 +52,13 @@ void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& custo
         all_with_pdv_str { convertPriceInWords(all_sum_with_pdv) },
         pdv_str { convertPriceInWords(pdv) };
 
+    html_template.replace(":SellerNameOnlyFIO", seller.name.mid(4));
     html_template.replace(":SellerName", seller.name);
     html_template.replace(":CustomerName", customerName);
     html_template.replace(":RR1", RR1);
     html_template.replace(":RR2", RR2);
     html_template.replace(":RRFull", seller.iban);
-    html_template.replace(":Date", datetime.mid(0, 10));
+    html_template.replace(":Date", date);
     html_template.replace(":ListNumber", listnumber);
     html_template.replace(":IPN", seller.ipn);
     html_template.replace(":Bank", seller.bank);
@@ -70,6 +71,127 @@ void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& custo
     html_template.replace(":Pdv_str", pdv_str);
     html_template.replace(":Pdv", just_pdv);
     html_template.replace(":i", QString::number(model->rowCount()));
+
+    printHtmlForm(html_template);
+}
+
+void DocumentPrinter::printBezPdvRahunok(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+{
+    QFile x(":bez_pdv_rahunok.htm");
+    x.open(QIODevice::ReadOnly);
+    QTextStream in(&x);
+    QString html_template = in.readAll();
+
+    if (seller.iban.size() < 10) {
+        QMessageBox::warning(0, "Помилка", "У продавця " + seller.name + " некоректний ІБАН. Змініть його перед повтором спроби", QMessageBox::Ok);
+        return;
+    }
+
+    // Get RR1, RR2
+    const QString RR1 = seller.iban.mid(0, 10);
+    const QString RR2 = seller.iban.mid(10);
+
+    // Creating data and calculating all sum
+    float all_sum {};
+    const QString data { generateTableDataAndCalculateAllSum(model, all_sum) };
+
+    const QString
+        all { QString::number(all_sum, 'f', 2) + " грн" };
+
+    // Geting written prices
+    const QString
+        all_str { convertPriceInWords(all_sum) };
+
+    html_template.replace(":SellerNameOnlyFIO", seller.name.mid(4));
+    html_template.replace(":SellerName", seller.name);
+    html_template.replace(":CustomerName", customerName);
+    html_template.replace(":RR1", RR1);
+    html_template.replace(":RR2", RR2);
+    html_template.replace(":RRFull", seller.iban);
+    html_template.replace(":Date", date);
+    html_template.replace(":ListNumber", listnumber);
+    html_template.replace(":IPN", seller.ipn);
+    html_template.replace(":Bank", seller.bank);
+    html_template.replace(":Number", seller.number);
+    html_template.replace(":EDRPOY", seller.edrpoy);
+    html_template.replace(":Data", data);
+    html_template.replace(":All_str", all_str);
+    html_template.replace(":All", all);
+    html_template.replace(":i", QString::number(model->rowCount()));
+
+    printHtmlForm(html_template);
+}
+
+void DocumentPrinter::printBezPdvNakladna(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+{
+    QFile x(":bez_pdv_nakladna.htm");
+    x.open(QIODevice::ReadOnly);
+    QTextStream in(&x);
+    QString html_template = in.readAll();
+
+    if (seller.iban.size() < 10) {
+        QMessageBox::warning(0, "Помилка", "У продавця " + seller.name + " некоректний ІБАН. Змініть його перед повтором спроби", QMessageBox::Ok);
+        return;
+    }
+
+    // Creating data and calculating all sum
+    float all_sum {};
+    const QString data { generateTableDataAndCalculateAllSum(model, all_sum) };
+
+    const QString
+        all { QString::number(all_sum, 'f', 2) + " грн" };
+
+    // Geting written prices
+    const QString
+        all_str { convertPriceInWords(all_sum) };
+
+    html_template.replace(":SellerNameOnlyFIO", seller.name.mid(4));
+    html_template.replace(":SellerName", seller.name);
+    html_template.replace(":CustomerName", customerName);
+    html_template.replace(":IBAN", seller.iban);
+    html_template.replace(":Date", date);
+    html_template.replace(":ListNumber", listnumber);
+    html_template.replace(":IPN", seller.ipn);
+    html_template.replace(":Bank", seller.bank);
+    html_template.replace(":EDRPOY", seller.edrpoy);
+    html_template.replace(":Data", data);
+    html_template.replace(":All_str", all_str);
+    html_template.replace(":All", all);
+    html_template.replace(":i", QString::number(model->rowCount()));
+
+    printHtmlForm(html_template);
+}
+
+void DocumentPrinter::printBezPdvChek(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+{
+    QFile x(":bez_pdv_chek.htm");
+    x.open(QIODevice::ReadOnly);
+    QTextStream in(&x);
+    QString html_template = in.readAll();
+
+    if (seller.iban.size() < 10) {
+        QMessageBox::warning(0, "Помилка", "У продавця " + seller.name + " некоректний ІБАН. Змініть його перед повтором спроби", QMessageBox::Ok);
+        return;
+    }
+
+    // Creating data and calculating all sum
+    float all_sum {};
+    const QString data { generateTableDataAndCalculateAllSumForChek(model, all_sum) };
+
+    const QString
+        all { QString::number(all_sum, 'f', 2) + " грн" };
+
+    // Geting written prices
+    const QString
+        all_str { convertPriceInWords(all_sum) };
+
+    html_template.replace(":SellerNameOnlyFIO", seller.name.mid(4));
+    html_template.replace(":SellerName", seller.name);
+    html_template.replace(":Date", date);
+    html_template.replace(":ListNumber", listnumber);
+    html_template.replace(":Data", data);
+    html_template.replace(":All_str", all_str);
+    html_template.replace(":All", all);
 
     printHtmlForm(html_template);
 }
@@ -464,6 +586,7 @@ QString DocumentPrinter::generateTableDataAndCalculateAllSum(const QSqlTableMode
 {
     QString data {};
     for (int i = 0; i < model->rowCount(); ++i) {
+        const float price = model->index(i, PRICE_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
         const float sum = model->index(i, SUM_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
         all_sum += sum;
 
@@ -473,10 +596,31 @@ QString DocumentPrinter::generateTableDataAndCalculateAllSum(const QSqlTableMode
         row.replace(":Name", model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString());
         row.replace(":Count", model->index(i, COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
         row.replace(":Unit", model->index(i, UNIT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Price", model->index(i, PRICE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
-        row.replace(":Sum", QString::number(sum, 'G'));
+        row.replace(":Price", QString::number(price, 'f', 2));
+        row.replace(":Sum", QString::number(sum, 'f', 2));
 
         data += row + "\n";
     }
+    return data;
+}
 
+QString DocumentPrinter::generateTableDataAndCalculateAllSumForChek(const QSqlTableModel *model, float &all_sum)
+{
+    QString data {};
+    for (int i = 0; i < model->rowCount(); ++i) {
+        const float price = model->index(i, PRICE_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
+        const float sum = model->index(i, SUM_COLUMN_INDEX).data(Qt::DisplayRole).toFloat();
+        all_sum += sum;
+
+        QString row = TABLE_ROW_FOR_CHECK;
+        row.replace(":Code", model->index(i, CODE_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Name", model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Count", model->index(i, COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Unit", model->index(i, UNIT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+        row.replace(":Price", QString::number(price, 'f', 2));
+        row.replace(":Sum", QString::number(sum, 'f', 2));
+
+        data += row + "\n";
+    }
+    return data;
 }
