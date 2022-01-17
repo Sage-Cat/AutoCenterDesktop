@@ -21,8 +21,10 @@ SOURCES += \
     utils/barcodelabelprinter.cpp \
     utils/code128/code128.cpp \
     utils/code128/code128item.cpp \
+    utils/comboboxitemdelegateforunit.cpp \
     utils/documentprinter.cpp \
     utils/pricelistparsertodb.cpp \
+    utils/xmldocumentloader.cpp \
     widgets/cars.cpp \
     widgets/customers.cpp \
     widgets/info.cpp \
@@ -44,8 +46,10 @@ HEADERS += \
     utils/barcodelabelprinter.h \
     utils/code128/code128.h \
     utils/code128/code128item.h \
+    utils/comboboxitemdelegateforunit.h \
     utils/documentprinter.h \
     utils/pricelistparsertodb.h \
+    utils/xmldocumentloader.h \
     widgets/cars.h \
     widgets/customers.h \
     widgets/info.h \

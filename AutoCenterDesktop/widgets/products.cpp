@@ -8,6 +8,8 @@
 #include "dialogs/findproduct.h"
 #include "dialogs/loadsupplierpricelist.h"
 
+#include "utils/comboboxitemdelegateforunit.h"
+
 #include "widgets/records.h"
 
 Products::Products(QWidget *parent) :
@@ -36,6 +38,9 @@ Products::Products(QWidget *parent) :
 
     //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
+
+    ComboBoxItemDelegateForUnit *comboDelegate = new ComboBoxItemDelegateForUnit(this);
+    ui->tableView->setItemDelegateForColumn(6,comboDelegate);
 
     ui->tableView->setItemDelegateForColumn(7, new NumberFormatDelegate(this));
 

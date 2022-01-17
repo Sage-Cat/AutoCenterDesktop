@@ -44,6 +44,7 @@ private slots:
     /* ACTION */
     void handleDataChange(const QModelIndex& topLeft, const QModelIndex&);
     void handleProductCodeChange(const QString &data, const QString &record_id);
+    void handleProductUnitChange(const QString &data, const QString &record_id);
     void handleCountCellChange(const QString &data, const QString &record_id);
     void handlePriceCellChange(const QString &data, const QString &record_id);
     void handleSimpleCellChange(const QString& columnName, const QString &data, const QString &record_id);

@@ -3,15 +3,7 @@
 
 #include <QSqlTableModel>
 
-struct Seller {
-    QString
-        name {},
-        iban {},
-        bank {},
-        number {},
-        edrpoy {},
-        ipn {};
-};
+struct Person;
 
 class DocumentPrinter {
 
@@ -26,13 +18,15 @@ class DocumentPrinter {
 
 public:
     DocumentPrinter();
-    void printPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+    void printPdvRahunok(const Person& seller, const QString& customerName, const QSqlTableModel* model,
         const QString& date, const QString& listnumber);
-    void printBezPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+    void printPdvNakladna(const Person& seller, const Person& customer, const QSqlTableModel* model,
         const QString& date, const QString& listnumber);
-    void printBezPdvNakladna(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+    void printBezPdvRahunok(const Person& seller, const QString& customerName, const QSqlTableModel* model,
         const QString& date, const QString& listnumber);
-    void printBezPdvChek(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+    void printBezPdvNakladna(const Person& seller, const QString& customerName, const QSqlTableModel* model,
+        const QString& date, const QString& listnumber);
+    void printBezPdvChek(const Person& seller, const QString& customerName, const QSqlTableModel* model,
         const QString& date, const QString& listnumber);
 
 private:

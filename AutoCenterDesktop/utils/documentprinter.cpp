@@ -13,11 +13,13 @@
 
 #include <QMessageBox>
 
+#include "global.h"
+
 DocumentPrinter::DocumentPrinter()
 {
 }
 
-void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& customerName, const QSqlTableModel* model,
+void DocumentPrinter::printPdvRahunok(const Person& seller, const QString& customerName, const QSqlTableModel* model,
                                       const QString &date, const QString &listnumber)
 {
     QFile x(":pdv_rahunok.htm");
@@ -75,7 +77,66 @@ void DocumentPrinter::printPdvRahunok(const Seller& seller, const QString& custo
     printHtmlForm(html_template);
 }
 
-void DocumentPrinter::printBezPdvRahunok(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+void DocumentPrinter::printPdvNakladna(const Person &seller, const Person &customer, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+{
+    QFile x(":pdv_nakladna.htm");
+    x.open(QIODevice::ReadOnly);
+    QTextStream in(&x);
+    QString html_template = in.readAll();
+
+    if (seller.iban.size() < 10) {
+        QMessageBox::warning(0, "Помилка", "У продавця " + seller.name + " некоректний ІБАН. Змініть його перед повтором спроби.", QMessageBox::Ok);
+        return;
+    }
+
+    if (customer.iban.size() < 10) {
+        QMessageBox::warning(0, "Помилка", "У продавця " + customer.name + " некоректний ІБАН. Змініть його перед повтором спроби.", QMessageBox::Ok);
+        return;
+    }
+
+    // Creating data and calculating all sum
+    float all_sum {};
+    const QString data { generateTableDataAndCalculateAllSum(model, all_sum) };
+
+    // Calculating pdv
+    const float pdv = all_sum * 0.2;
+    const float all_sum_with_pdv = all_sum + pdv;
+
+    const QString
+        all { QString::number(all_sum, 'f', 2) + " грн" },
+        just_pdv { QString::number(pdv, 'f', 2) + " грн" },
+        all_with_pdv { QString::number(all_sum_with_pdv, 'f', 2) + " грн" };
+
+    // Geting written prices
+    const QString
+        all_with_pdv_str { convertPriceInWords(all_sum_with_pdv) },
+        pdv_str { convertPriceInWords(pdv) };
+
+    html_template.replace(":SellerNameOnlyFIO", seller.name.mid(4));
+    html_template.replace(":SellerName", seller.name);
+    html_template.replace(":CustomerName", customer.name);
+    html_template.replace(":c_Address", customer.address);
+    html_template.replace(":c_EDRPOY", customer.edrpoy);
+    html_template.replace(":c_IPN", customer.ipn);
+    html_template.replace(":IBAN", seller.iban);
+    html_template.replace(":Date", date);
+    html_template.replace(":ListNumber", listnumber);
+    html_template.replace(":IPN", seller.ipn);
+    html_template.replace(":Bank", seller.bank);
+    html_template.replace(":Number", seller.number);
+    html_template.replace(":EDRPOY", seller.edrpoy);
+    html_template.replace(":Data", data);
+    html_template.replace(":All_with_Pdv_str", all_with_pdv_str);
+    html_template.replace(":All_with_Pdv", all_with_pdv);
+    html_template.replace(":All", all);
+    html_template.replace(":Pdv_str", pdv_str);
+    html_template.replace(":Pdv", just_pdv);
+    html_template.replace(":i", QString::number(model->rowCount()));
+
+    printHtmlForm(html_template);
+}
+
+void DocumentPrinter::printBezPdvRahunok(const Person &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
 {
     QFile x(":bez_pdv_rahunok.htm");
     x.open(QIODevice::ReadOnly);
@@ -122,7 +183,7 @@ void DocumentPrinter::printBezPdvRahunok(const Seller &seller, const QString &cu
     printHtmlForm(html_template);
 }
 
-void DocumentPrinter::printBezPdvNakladna(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+void DocumentPrinter::printBezPdvNakladna(const Person &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
 {
     QFile x(":bez_pdv_nakladna.htm");
     x.open(QIODevice::ReadOnly);
@@ -162,7 +223,7 @@ void DocumentPrinter::printBezPdvNakladna(const Seller &seller, const QString &c
     printHtmlForm(html_template);
 }
 
-void DocumentPrinter::printBezPdvChek(const Seller &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
+void DocumentPrinter::printBezPdvChek(const Person &seller, const QString &customerName, const QSqlTableModel *model, const QString &date, const QString &listnumber)
 {
     QFile x(":bez_pdv_chek.htm");
     x.open(QIODevice::ReadOnly);

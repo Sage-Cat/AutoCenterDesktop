@@ -19,5 +19,7 @@
         <file>bez_pdv_nakladna.htm</file>
         <file>bez_pdv_rahunok.htm</file>
         <file>bez_pdv_chek.htm</file>
+        <file>pdv_nakladna.htm</file>
+        <file>podatkova.xml</file>
     </qresource>
 </RCC>

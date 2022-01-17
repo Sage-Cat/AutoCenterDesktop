@@ -1,17 +1,19 @@
 #include "records.h"
 #include "ui_records.h"
 
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlTableModel>
-#include <QSqlError>
 
+#include <QDateTime>
 #include <QMessageBox>
 #include <QVector>
-#include <QDateTime>
 
 #include "global.h"
 #include "utils/barcodelabelprinter.h"
+#include "utils/comboboxitemdelegateforunit.h"
 #include "utils/documentprinter.h"
+#include "utils/xmldocumentloader.h"
 
 #include "dialogs/addproduct.h"
 
@@ -48,22 +50,25 @@ Records::Records(QWidget* parent, int list_id)
     ui->tableView->setItemDelegateForColumn(8, new NumberFormatDelegate(this));
     ui->tableView->setItemDelegateForColumn(9, new NumberFormatDelegate(this));
 
+    ComboBoxItemDelegateForUnit *comboDelegate = new ComboBoxItemDelegateForUnit(this);
+    ui->tableView->setItemDelegateForColumn(7,comboDelegate);
+
     // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-//    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
-//        if (i == NAME_COLUMN_INDEX)
-//            ui->tableView->setColumnWidth(i, 800);
-//        else if (i == CODE_COLUMN_INDEX)
-//            ui->tableView->setColumnWidth(i, 300);
-//        else
-//            ui->tableView->setColumnWidth(i, 150);
-//    }
+    //    for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
+    //        if (i == NAME_COLUMN_INDEX)
+    //            ui->tableView->setColumnWidth(i, 800);
+    //        else if (i == CODE_COLUMN_INDEX)
+    //            ui->tableView->setColumnWidth(i, 300);
+    //        else
+    //            ui->tableView->setColumnWidth(i, 150);
+    //    }
 
     // Comboboxes
     initComboboxes();
 
-    // Datetime and enable or disable print buttons
+    // Datetime and enable
     initDateTimeAndPrintButtons();
 
     connect(model, &QSqlTableModel::dataChanged, this, &Records::handleDataChange);
@@ -74,7 +79,7 @@ Records::~Records()
     delete ui;
 }
 
-void Records::resizeEvent(QResizeEvent *event)
+void Records::resizeEvent(QResizeEvent* event)
 {
     const int columnsCount = ui->tableView->model()->columnCount();
     const int PARENT_WIDTH = this->width();
@@ -123,8 +128,7 @@ void Records::on_btn_del_clicked()
     if (selectedIndexes.isEmpty())
         return;
 
-    for (int i = 0; i < selectedIndexes.size(); ++i)
-    {
+    for (int i = 0; i < selectedIndexes.size(); ++i) {
         const QString record_id = selectedIndexes.at(i).siblingAtColumn(ID_COLUMN_INDEX).data(Qt::DisplayRole).toString();
         QSqlQuery qry;
         qry.exec("PRAGMA foreign_keys=ON");
@@ -136,7 +140,7 @@ void Records::on_btn_del_clicked()
 void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
 {
     const QVector<int> editableColumns = {
-        CODE_COLUMN_INDEX /* code */, PRICE_COLUMN_INDEX /* price */, COUNT_COLUMN_INDEX /* count */
+        CODE_COLUMN_INDEX /* code */, UNIT_COLUMN_INDEX, PRICE_COLUMN_INDEX /* price */, COUNT_COLUMN_INDEX /* count */
     };
     const int column = topLeft.column();
     const QString data = topLeft.data(Qt::DisplayRole).toString();
@@ -147,11 +151,14 @@ void Records::handleDataChange(const QModelIndex& topLeft, const QModelIndex&)
         case 2: {
             handleProductCodeChange(data, record_id);
         } break;
-        case 8: {
-            handlePriceCellChange(data, record_id);
-        } break;
         case 6: {
             handleCountCellChange(data, record_id);
+        } break;
+        case 7: {
+            handleProductUnitChange(topLeft.data(Qt::DisplayRole).toString(), record_id);
+        } break;
+        case 8: {
+            handlePriceCellChange(data, record_id);
         } break;
         }
     }
@@ -180,9 +187,8 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
             "Можливо ви хочете додати новий вид товару?",
             QMessageBox::Yes | QMessageBox::No);
 
-        if (result == QMessageBox::Yes)
-        {
-            AddProduct *dlg = new AddProduct;
+        if (result == QMessageBox::Yes) {
+            AddProduct* dlg = new AddProduct;
             dlg->setCodeToLineEdit(data);
             if (dlg->exec() == QDialog::Accepted)
                 handleProductCodeChange(data, record_id);
@@ -190,60 +196,66 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
     }
 }
 
-void Records::handleCountCellChange(const QString &data, const QString &record_id)
+void Records::handleProductUnitChange(const QString &data, const QString &record_id)
+{
+    // #1 Find product_id by code
+    QSqlQuery qry;
+    qry.exec("SELECT product_id FROM record WHERE id='" + record_id + "'");
+    if (qry.next()) {
+        // #2 Change unit for product and update cell
+        qry.exec("UPDATE product SET unit='" +
+                 data + "' WHERE id=" +
+                 qry.value(0).toString()
+                 );
+    }
+}
+
+void Records::handleCountCellChange(const QString& data, const QString& record_id)
 {
     // get previos value
     QSqlQuery qry;
     qry.exec("SELECT count, product_id FROM record WHERE id=" + record_id);
     bool isNumber { true };
     data.toInt(&isNumber);
-    if (qry.next() && isNumber)
-    {
+    if (qry.next() && isNumber) {
         // 5(new) - 3(old) -> amount became bigger on 2
         const int difference = data.toInt() - qry.value(0).toInt();
 
         const QString product_id = qry.value(1).toString();
-        if (product_id.isEmpty())
-        {
+        if (product_id.isEmpty()) {
             QMessageBox::warning(this, "Попередження", "Встановіть будь-ласка спочатку код товару.", QMessageBox::Ok);
             return;
         }
 
         qry.exec("SELECT amount FROM product WHERE id=" + product_id);
-        if (qry.next() && difference != 0)
-        {
+        if (qry.next() && difference != 0) {
             int newAmount {};
             if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
                 newAmount = qry.value(0).toInt() + difference; // plus goods to storage
             else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna]
-                     || docType == DOC_TYPES_NAMES[DOC_TYPES::Tovarniy_chek])
+                || docType == DOC_TYPES_NAMES[DOC_TYPES::Tovarniy_chek])
                 newAmount = qry.value(0).toInt() - difference; // minus goods
 
             if (qry.exec("UPDATE product SET amount=" + QString::number(newAmount) + " WHERE id=" + product_id))
                 handleSimpleCellChange("count", data, record_id);
             else
-                QMessageBox::critical(this, "Помилка", "Не вдалося змінити к-сть товару на складі. \nLog: " +
-                                      qry.lastError().text(), QMessageBox::Ok);
+                QMessageBox::critical(this, "Помилка", "Не вдалося змінити к-сть товару на складі. \nLog: " + qry.lastError().text(), QMessageBox::Ok);
         }
     }
 }
 
-void Records::handlePriceCellChange(const QString &data, const QString &record_id)
+void Records::handlePriceCellChange(const QString& data, const QString& record_id)
 {
     bool isNumber { true };
     data.toFloat(&isNumber);
-    if (isNumber)
-    {
-        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
-        {
+    if (isNumber) {
+        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya]) {
             QSqlQuery qry;
             qry.exec("SELECT product_id FROM record WHERE id=" + record_id);
-            if (qry.next())
-            {
+            if (qry.next()) {
                 const QString product_id = qry.value(0).toString();
                 if (!qry.exec("UPDATE product SET purchase_price='" + data + "' WHERE id=" + product_id))
-                    QMessageBox::critical(this, "Помилка", "Не вдалося встановити ціну закупки. \nLog: " +
-                                          qry.lastError().text(), QMessageBox::Ok);
+                    QMessageBox::critical(this, "Помилка", "Не вдалося встановити ціну закупки. \nLog: " + qry.lastError().text(), QMessageBox::Ok);
             }
         }
         handleSimpleCellChange("price", data, record_id);
@@ -284,7 +296,7 @@ void Records::on_btn_print_document_clicked()
     const QString listNumber = qry.value(0).toString();
 
     qry.exec("SELECT name, iban, bank, edrpoy, number, ipn, isPdvPayer FROM seller WHERE id=" + seller_index_to_id[ui->comboBox_Seller->currentIndex()]);
-    Seller seller;
+    Person seller;
     if (!qry.next())
         return;
     seller.name = qry.value(0).toString();
@@ -297,17 +309,43 @@ void Records::on_btn_print_document_clicked()
     const bool isPdv = qry.value(6).toBool();
 
     DocumentPrinter* printer = new DocumentPrinter();
-    if (isPdv)
-    {
-        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
+    if (isPdv) {
+        if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok]) {
             printer->printPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
                 ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
-        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna])
-            2+3;
-        else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Podatkova_nakladna])
-            1+2;
-    }
-    else // Bez pdv
+        } else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Vydatkova_nakladna]) {
+            qry.exec("SELECT iban, address, edrpoy, ipn FROM customer WHERE id=" + customer_index_to_id[ui->comboBox_Customer->currentIndex()]);
+            if (qry.next()) {
+                Person customer;
+                customer.iban = qry.value(0).toString();
+                customer.address = qry.value(1).toString();
+                customer.edrpoy = qry.value(2).toString();
+                customer.ipn = qry.value(3).toString();
+                customer.name = ui->comboBox_Customer->currentText();
+
+                printer->printPdvNakladna(seller, customer, model,
+                    ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
+            } else {
+                QMessageBox::critical(this, "Помилка", "Не вдалося знайти покупця у базі.\n" + qry.lastError().text(), QMessageBox::Ok);
+            }
+        } else if (docType == DOC_TYPES_NAMES[DOC_TYPES::Podatkova_nakladna]) // CREATING xml, not printing
+        {
+            qry.exec("SELECT ipn FROM customer WHERE id=" + customer_index_to_id[ui->comboBox_Customer->currentIndex()]);
+            if (qry.next()) {
+                Person customer;
+                customer.ipn = qry.value(0).toString();
+                customer.name = ui->comboBox_Customer->currentText();
+
+                XmlDocumentLoader *loader = new XmlDocumentLoader;
+                loader->generatePodatkovaNakladna(seller, customer, model,
+                                                  ui->line_datetime->date(), listNumber);
+                delete loader;
+            } else {
+                QMessageBox::critical(this, "Помилка", "Не вдалося знайти покупця у базі.\n" + qry.lastError().text(), QMessageBox::Ok);
+            }
+        }
+
+    } else // Bez pdv
     {
         if (docType == DOC_TYPES_NAMES[DOC_TYPES::Rahunok])
             printer->printBezPdvRahunok(seller, ui->comboBox_Customer->currentText(), model,
@@ -319,7 +357,6 @@ void Records::on_btn_print_document_clicked()
             printer->printBezPdvChek(seller, ui->comboBox_Customer->currentText(), model,
                 ui->line_datetime->date().toString("dd.MM.yyyy"), listNumber);
     }
-
 }
 
 void Records::updateView()
@@ -346,7 +383,13 @@ void Records::initDateTimeAndPrintButtons()
 
         docType = qry.value(1).toString();
         if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya))
-            ui->btn_print_document->setDisabled(true);
+            ui->btn_print_document->setHidden(true);
+        else
+        {
+            ui->btn_print_barcode->setHidden(true);
+            if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Podatkova_nakladna))
+                ui->btn_print_document->setText("Вивантажити у XML");
+        }
     }
 
     QDateTime formated = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss"); // from SQLite format
@@ -405,9 +448,8 @@ QString Records::getFromDBCurrentListColumn(QString column_name)
     return res;
 }
 
-void Records::on_line_datetime_dateTimeChanged(const QDateTime &dateTime)
+void Records::on_line_datetime_dateTimeChanged(const QDateTime& dateTime)
 {
     QSqlQuery qry;
     qry.exec("UPDATE list SET datetime='" + dateTime.toString("yyyy-MM-dd hh:mm:ss") + "' WHERE id=" + QString::number(list_id));
 }
-

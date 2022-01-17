@@ -2,6 +2,20 @@
 #define GLOBAL_H
 
 #include <QStringList>
+#include <QMap>
+
+
+struct Person {
+    QString
+        name {},
+        iban {},
+        bank {},
+        number {},
+        edrpoy {},
+        ipn {},
+        address {};
+};
+
 
 const QStringList DOC_TYPES_NAMES {
     "Рахунок",
@@ -23,6 +37,13 @@ enum DOC_TYPES {
 
 const QStringList Suppliers {
     "Омега"
+};
+
+const QMap<QString, QString> UNIT_CODE {
+    { "шт", "2009" },
+    { "компл", "2938" },
+    { "м", "0101" },
+    { "л", "0138" }
 };
 
 
