@@ -36,7 +36,7 @@ Desktop app created using Qt/C++
 
 - ### Printing of created html-forms of documents (Ukrainian legislation).
 <p align="center">
-  <img align="center" src="https://user-images.githubusercontent.com/43709724/150021858-9cf83dcc-1694-436d-9ae5-7d83873cf405.png">
+  <img align="center" src="https://user-images.githubusercontent.com/43709724/150027870-71ea1ba6-9e21-4d05-b6d5-bc92f950f072.png">
 </p>
 
 - ### Printing labels with barcodes. Must contain the price and name of the product.
