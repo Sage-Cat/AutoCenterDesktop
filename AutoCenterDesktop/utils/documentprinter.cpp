@@ -287,8 +287,8 @@ QString DocumentPrinter::convertPriceInWords(float sum)
     int integer = static_cast<int>(sum);
     int hundredth = static_cast<int>(100.0 * (sum - static_cast<float>(integer)));
 
-    // fisrt & second digits
-    if (integer % 10 != 0 && integer % 100 == 1) {
+    // first & second digits
+    if (integer % 10 != 0 && integer / 10 % 10 == 1) {
         switch (integer % 10) {
         case 1:
             part_one = "одинадцять гривень " + part_one;
@@ -416,7 +416,7 @@ QString DocumentPrinter::convertPriceInWords(float sum)
 
     // fourth & fifth digits
     integer /= 10;
-    if (integer % 10 != 0 && integer % 100 == 1) {
+    if (integer % 10 != 0 && integer / 10 % 10 == 1) {
         switch (integer % 10) {
         case 1:
             part_one = "одинадцять тисяч " + part_one;
@@ -447,7 +447,7 @@ QString DocumentPrinter::convertPriceInWords(float sum)
             break;
         }
     } else {
-        const QString thousand = integer % 100 == 0 && integer % 1000 == 0 ? "одна тисяча " : "тисяч ";
+        const QString thousand = integer / 10 % 10 == 0 && integer / 10 / 10 % 10 == 0 ? "одна тисяча " : "тисяч ";
         switch (integer % 10) {
         case 1:
             part_one = thousand + part_one;
@@ -544,7 +544,7 @@ QString DocumentPrinter::convertPriceInWords(float sum)
     /* -------------------------------------------------------- */
 
     if (hundredth != 0) {
-        if (hundredth % 10 != 0 && hundredth % 100 == 1) {
+        if (hundredth % 10 != 0 && hundredth / 10 % 10 == 1) {
             switch (hundredth % 10) {
             case 1:
                 part_two = "одинадцять копійок " + part_two;

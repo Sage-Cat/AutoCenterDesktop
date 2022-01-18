@@ -183,7 +183,7 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
         // #2 Change product_id cell and price
 
         // SPECIAL for price +30% if not receipt
-        float price = qry.value(1).toFloat();
+        float price = qry.value(1).toString().replace(",", ".").toFloat();
         if (docType != DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
             price *= 1.3;
 
