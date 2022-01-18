@@ -34,7 +34,7 @@ Desktop app created using Qt/C++
 
 ![image](https://user-images.githubusercontent.com/43709724/150022120-7542681e-2336-4a3e-a7d1-4ab0fb7af5e0.png)
 
-- ### Printing of created html-forms of documents (Ukrainian legislation .
+- ### Printing of created html-forms of documents (Ukrainian legislation).
 <p align="center">
   <img align="center" src="https://user-images.githubusercontent.com/43709724/150021858-9cf83dcc-1694-436d-9ae5-7d83873cf405.png">
 </p>
