@@ -116,3 +116,9 @@ void MainWindow::on_act_goods_triggered()
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+
+void MainWindow::on_act_exit_triggered()
+{
+    this->close();
+}
+

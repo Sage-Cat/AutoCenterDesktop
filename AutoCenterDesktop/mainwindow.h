@@ -31,6 +31,8 @@ private slots:
 
     void on_act_goods_triggered();
 
+    void on_act_exit_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
