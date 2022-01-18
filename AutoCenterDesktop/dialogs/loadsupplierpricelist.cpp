@@ -15,7 +15,6 @@ LoadSupplierPricelist::LoadSupplierPricelist(QWidget* parent)
 {
     ui->setupUi(this);
 
-    ui->comboBox->addItem("");
     ui->comboBox->addItems(Suppliers);
 }
 

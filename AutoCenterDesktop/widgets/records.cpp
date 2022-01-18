@@ -50,8 +50,8 @@ Records::Records(QWidget* parent, int list_id)
     ui->tableView->setItemDelegateForColumn(8, new NumberFormatDelegate(this));
     ui->tableView->setItemDelegateForColumn(9, new NumberFormatDelegate(this));
 
-    ComboBoxItemDelegateForUnit *comboDelegate = new ComboBoxItemDelegateForUnit(this);
-    ui->tableView->setItemDelegateForColumn(7,comboDelegate);
+    ComboBoxItemDelegateForUnit* comboDelegate = new ComboBoxItemDelegateForUnit(this);
+    ui->tableView->setItemDelegateForColumn(7, comboDelegate);
 
     // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -65,11 +65,19 @@ Records::Records(QWidget* parent, int list_id)
     //            ui->tableView->setColumnWidth(i, 150);
     //    }
 
+    // Datetime and enable
+    initDateTimeAndPrintButtons();
+
     // Comboboxes
     initComboboxes();
 
-    // Datetime and enable
-    initDateTimeAndPrintButtons();
+    if (docType == DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya])
+    {
+        ui->label_customer->hide();
+        ui->comboBox_Customer->hide();
+        ui->label_seller->setText("Прийняв(ла) товар:");
+        ui->label_sum->setText("Усьго: ");
+    }
 
     connect(model, &QSqlTableModel::dataChanged, this, &Records::handleDataChange);
 }
@@ -196,17 +204,14 @@ void Records::handleProductCodeChange(const QString& data, const QString& record
     }
 }
 
-void Records::handleProductUnitChange(const QString &data, const QString &record_id)
+void Records::handleProductUnitChange(const QString& data, const QString& record_id)
 {
     // #1 Find product_id by code
     QSqlQuery qry;
     qry.exec("SELECT product_id FROM record WHERE id='" + record_id + "'");
     if (qry.next()) {
         // #2 Change unit for product and update cell
-        qry.exec("UPDATE product SET unit='" +
-                 data + "' WHERE id=" +
-                 qry.value(0).toString()
-                 );
+        qry.exec("UPDATE product SET unit='" + data + "' WHERE id=" + qry.value(0).toString());
     }
 }
 
@@ -336,9 +341,9 @@ void Records::on_btn_print_document_clicked()
                 customer.ipn = qry.value(0).toString();
                 customer.name = ui->comboBox_Customer->currentText();
 
-                XmlDocumentLoader *loader = new XmlDocumentLoader;
+                XmlDocumentLoader* loader = new XmlDocumentLoader;
                 loader->generatePodatkovaNakladna(seller, customer, model,
-                                                  ui->line_datetime->date(), listNumber);
+                    ui->line_datetime->date(), listNumber);
                 delete loader;
             } else {
                 QMessageBox::critical(this, "Помилка", "Не вдалося знайти покупця у базі.\n" + qry.lastError().text(), QMessageBox::Ok);
@@ -384,8 +389,7 @@ void Records::initDateTimeAndPrintButtons()
         docType = qry.value(1).toString();
         if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Nakladna_na_nadhodjennya))
             ui->btn_print_document->setHidden(true);
-        else
-        {
+        else {
             ui->btn_print_barcode->setHidden(true);
             if (docType == DOC_TYPES_NAMES.at(DOC_TYPES::Podatkova_nakladna))
                 ui->btn_print_document->setText("Вивантажити у XML");
@@ -402,10 +406,11 @@ void Records::initComboboxes()
     const QString currentCustomerID = getFromDBCurrentListColumn("customer_id");
     const QString currentSellerID = getFromDBCurrentListColumn("seller_id");
 
-    // Customers
     QSqlQuery qry;
-    qry.exec("SELECT id, name FROM customer");
     int index {};
+
+    // Customers
+    qry.exec("SELECT id, name FROM customer");
     while (qry.next()) {
         customer_index_to_id[index] = qry.value(0).toString() /*id*/;
         ui->comboBox_Customer->insertItem(

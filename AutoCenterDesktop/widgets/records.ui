@@ -287,7 +287,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="label_sum">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -300,7 +300,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Сума без пдв:</string>
+          <string>Сума без пдв: </string>
          </property>
         </widget>
        </item>

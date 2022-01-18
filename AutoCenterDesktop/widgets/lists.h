@@ -43,6 +43,7 @@ private slots:
 
 public slots:
     void updateView();
+    void handleChildTabRecordsRequest(int list_id);
 
 signals:
     void tabRecordsRequested(int list_id);

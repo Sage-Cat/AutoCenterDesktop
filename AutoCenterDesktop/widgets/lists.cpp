@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "dialogs/setlisttype.h"
+#include "dialogs/loadnakladna.h"
 #include "mainwindow.h"
 
 #include "global.h"
@@ -58,6 +59,16 @@ Lists::Lists(QWidget* parent, bool isSale)
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(ID_COLUMN_INDEX, true); // hide ID
     ui->tableView->setColumnHidden(IPN_COLUMN_INDEX, true); // hide IPN
+
+    if (isSale)
+    {
+        ui->btn_load->hide();
+    }
+    else
+    {
+        ui->btn_create->hide();
+        ui->tableView->setColumnHidden(5, true);
+    }
 
     //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
@@ -148,6 +159,11 @@ void Lists::on_tableView_doubleClicked(const QModelIndex& index)
 
 void Lists::on_btn_load_clicked()
 {
+    LoadNakladna *dlg = new LoadNakladna(this);
+    dlg->exec();
+    delete dlg;
+
+    updateView();
 }
 
 void Lists::updateView()
@@ -155,16 +171,25 @@ void Lists::updateView()
     model->select();
 }
 
+void Lists::handleChildTabRecordsRequest(int list_id)
+{
+    emit tabRecordsRequested(list_id);
+}
+
 void Lists::resizeEvent(QResizeEvent* event)
 {
     const int columnsCount = ui->tableView->model()->columnCount();
     const int PARENT_WIDTH = this->width();
-    const int NAMES_COLUMN_WIDTH = PARENT_WIDTH / 3.8;
+    const int SNAME_COLUMN_WIDTH = PARENT_WIDTH / 4.5;
+    const int CNAME_COLUMN_WIDTH = PARENT_WIDTH / 3;
     const int DATA_COLUMN_WIDTH = PARENT_WIDTH / 6.5;
-    const int OTHER_COLUMNS_WIDTH = (PARENT_WIDTH - NAMES_COLUMN_WIDTH * 2 - DATA_COLUMN_WIDTH * 2) / (columnsCount - 4);
+    const int OTHER_COLUMNS_WIDTH = (PARENT_WIDTH - CNAME_COLUMN_WIDTH
+                                     - SNAME_COLUMN_WIDTH - DATA_COLUMN_WIDTH * 2) / (columnsCount - 4);
     for (int i = 0; i < ui->tableView->model()->columnCount(); ++i) {
-        if (i == 5 || i == 6)
-            ui->tableView->setColumnWidth(i, NAMES_COLUMN_WIDTH);
+        if (i == 5)
+            ui->tableView->setColumnWidth(i, CNAME_COLUMN_WIDTH);
+        else if (i == 6)
+            ui->tableView->setColumnWidth(i, SNAME_COLUMN_WIDTH);
         else if (i == 2 || i == 4)
             ui->tableView->setColumnWidth(i, DATA_COLUMN_WIDTH);
         else

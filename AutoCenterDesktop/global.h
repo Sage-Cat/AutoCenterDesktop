@@ -16,6 +16,17 @@ struct Person {
         address {};
 };
 
+struct Record {
+    QString
+        code {},
+        tnved{},
+        catalog{},
+        name{},
+        count{},
+        unit{},
+        purchase_price{};
+};
+
 
 const QStringList DOC_TYPES_NAMES {
     "Рахунок",

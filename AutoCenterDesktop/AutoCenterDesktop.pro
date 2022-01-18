@@ -14,6 +14,7 @@ SOURCES += \
     dialogs/editcustomer.cpp \
     dialogs/editseller.cpp \
     dialogs/findproduct.cpp \
+    dialogs/loadnakladna.cpp \
     dialogs/loadsupplierpricelist.cpp \
     dialogs/setlisttype.cpp \
     main.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     dialogs/editcustomer.h \
     dialogs/editseller.h \
     dialogs/findproduct.h \
+    dialogs/loadnakladna.h \
     dialogs/loadsupplierpricelist.h \
     dialogs/setlisttype.h \
     global.h \
@@ -64,6 +66,7 @@ FORMS += \
     dialogs/editcustomer.ui \
     dialogs/editseller.ui \
     dialogs/findproduct.ui \
+    dialogs/loadnakladna.ui \
     dialogs/loadsupplierpricelist.ui \
     dialogs/setlisttype.ui \
     mainwindow.ui \

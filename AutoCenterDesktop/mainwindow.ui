@@ -988,7 +988,6 @@ QTabWidget::tab-bar {
     <property name="title">
      <string>Менеджмент</string>
     </property>
-    <addaction name="act_inventory"/>
     <addaction name="separator"/>
     <addaction name="act_customers"/>
     <addaction name="act_sellers"/>
