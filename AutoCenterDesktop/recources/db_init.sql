@@ -14,14 +14,15 @@ CREATE TABLE IF NOT EXISTS customer (
 
 |Table: seller|
 CREATE TABLE IF NOT EXISTS seller (
-    id      INTEGER PRIMARY KEY ON CONFLICT REPLACE AUTOINCREMENT,
-    name    TEXT,
-    iban    TEXT,
-    bank    REAL,
-    edrpoy  TEXT,
-    ipn     TEXT,
-    address TEXT,
-    number  TEXT
+    id         INTEGER PRIMARY KEY ON CONFLICT REPLACE AUTOINCREMENT,
+    name       TEXT,
+    iban       TEXT,
+    bank       REAL,
+    edrpoy     TEXT,
+    ipn        TEXT,
+    address    TEXT,
+    number     TEXT,
+    isPdvPayer BOOLEAN
 );
 
 |Table: user|
@@ -37,14 +38,14 @@ CREATE TABLE IF NOT EXISTS user (
 
 |Table: product|
 CREATE TABLE IF NOT EXISTS product (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    amount  TEXT    DEFAULT (0),
-    code    TEXT    UNIQUE ON CONFLICT REPLACE,
-    catalog TEXT,
-    tnved   TEXT,
-    name    TEXT,
-    unit    TEXT,
-    price   FLOAT
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount         TEXT    DEFAULT (0),
+    code           TEXT    UNIQUE ON CONFLICT REPLACE,
+    catalog        TEXT,
+    tnved          TEXT,
+    name           TEXT,
+    unit           TEXT,
+    purchase_price FLOAT
 );
 
 |Table: car|
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS user_log (
     ID_User  INTEGER  REFERENCES user (ID) ON DELETE CASCADE
 );
 
+
 |Table: list|
 CREATE TABLE IF NOT EXISTS list (
     id          INTEGER  PRIMARY KEY AUTOINCREMENT,
@@ -70,8 +72,8 @@ CREATE TABLE IF NOT EXISTS list (
                          NOT NULL,
     number      INTEGER,
     type        TEXT,
-    customer_id INTEGER  REFERENCES customer (ID) ON DELETE CASCADE,
-    seller_id   INTEGER  REFERENCES seller (ID) ON DELETE CASCADE
+    customer_id INTEGER  REFERENCES customer (id) ON DELETE CASCADE,
+    seller_id   INTEGER  REFERENCES seller (id) ON DELETE CASCADE
 );
 
 
@@ -80,7 +82,7 @@ CREATE TABLE IF NOT EXISTS record (
     id         INTEGER  PRIMARY KEY AUTOINCREMENT,
     count      INTEGER,
     product_id INTEGER  REFERENCES product (ID) ON DELETE CASCADE,
-    list_id    INTEGER  REFERENCES list (ID),
+    list_id    INTEGER  REFERENCES list (id) ON DELETE CASCADE,
     price      FLOAT,
     sum        [FLOAT ] GENERATED ALWAYS AS (count * price)
 );
@@ -89,7 +91,7 @@ CREATE TABLE IF NOT EXISTS record (
 CREATE VIEW IF NOT EXISTS customer_view AS
     SELECT customer.id,
            customer.name,
-           COUNT(car.id),
+           COUNT(car.id) AS car_count,
            customer.address,
            customer.number,
            customer.email,
