@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QTemporaryFile>
 #include <QDesktopServices>
+#include <QTextCodec>
 
 #include <QMessageBox>
 
@@ -262,6 +263,7 @@ void DocumentPrinter::printHtmlForm(const QString& html)
     QFile tmpFile(QLatin1String( "html_doc.html" ));
     tmpFile.open(QIODevice::WriteOnly);
     QTextStream out( &tmpFile );
+    out.setCodec(QTextCodec::codecForName("Windows-1251"));
     out << html;
     tmpFile.close();
     QDesktopServices::openUrl( QUrl("html_doc.html") );
