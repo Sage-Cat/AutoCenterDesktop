@@ -137,9 +137,17 @@ void Customers::handleDataChange(const QModelIndex &topLeft, const QModelIndex &
 
 void Customers::handleSimpleCellChange(const QString &columnName, const QString &data, const QString &customer_id)
 {
+    static const QStringList allowedColumns {
+        "name", "address", "number", "email", "iban", "bank", "edrpoy", "ipn"
+    };
+    if (!allowedColumns.contains(columnName))
+        return;
+
     QSqlQuery qry;
-    const QString query_str = "UPDATE customer SET %1='%2' WHERE id='%3'";
-    qry.exec(query_str.arg(columnName, data, customer_id));
+    qry.prepare("UPDATE customer SET " + columnName + " = :value WHERE id = :id");
+    qry.bindValue(":value", data);
+    qry.bindValue(":id", customer_id.toInt());
+    qry.exec();
 }
 
 void Customers::updateView()
@@ -153,4 +161,3 @@ void Customers::on_tableView_doubleClicked(const QModelIndex &index)
     EditCustomer *dlg = new EditCustomer(this, model, index.row());
     dlg->exec();
 }
-

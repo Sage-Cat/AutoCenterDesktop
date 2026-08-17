@@ -7,7 +7,8 @@ Code128Item::Code128Item() :
     m_TextVisible(true),
     m_Width(200),
     m_Height(80),
-    m_CodeLength(0)
+    m_CodeLength(0),
+    m_HighDPI(false)
 {
 }
 
@@ -94,4 +95,3 @@ void Code128Item::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
         painter->drawText(box, m_Text, Qt::AlignHCenter | Qt::AlignTop);
     }
 }
-

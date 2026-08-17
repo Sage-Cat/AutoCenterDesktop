@@ -85,7 +85,7 @@ public:
         :QStyledItemDelegate(parent)
     {}
     QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE{
-        switch(value.type()){
+        switch(value.userType()){
         case QMetaType::Float:
             return locale.toString(value.toFloat(),'f', 2);
         case QMetaType::Double:

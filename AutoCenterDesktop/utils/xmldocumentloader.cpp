@@ -40,15 +40,15 @@ void XmlDocumentLoader::generatePodatkovaNakladna(const Person& seller,
         const QString tnved = model->index(i, TNVED_COLUMN_INDEX).data(Qt::DisplayRole).toString();
 
         QString row = PODATKOVA_NAKLADNA_ROW;
-        row.replace(":TNVED", tnved);
+        row.replace(":TNVED", tnved.toHtmlEscaped());
         row.replace(":isImport",
             tnved.size() == 4 ? ""
                               : "<RXXXXG32 ROWNUM=\":i\">1</RXXXXG32>\n");
         row.replace(
             ":Name",
-            model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString());
+            model->index(i, NAME_COLUMN_INDEX).data(Qt::DisplayRole).toString().toHtmlEscaped());
         row.replace(":UnitCode", UNIT_CODE[unit]);
-        row.replace(":Unit", unit);
+        row.replace(":Unit", unit.toHtmlEscaped());
         row.replace(
             ":Count",
             model->index(i, COUNT_COLUMN_INDEX).data(Qt::DisplayRole).toString());
@@ -63,16 +63,16 @@ void XmlDocumentLoader::generatePodatkovaNakladna(const Person& seller,
     const float pdv = all_sum * 0.2;
     const float all_sum_with_pdv = all_sum + pdv;
 
-    xml_data.replace(":EDRPOY", seller.edrpoy);
-    xml_data.replace(":ListNumber", listnumber);
+    xml_data.replace(":EDRPOY", seller.edrpoy.toHtmlEscaped());
+    xml_data.replace(":ListNumber", listnumber.toHtmlEscaped());
     xml_data.replace(":Month", date.toString("MM"));
     xml_data.replace(":Year", date.toString("yyyy"));
     xml_data.replace(":Date_No_Dots", date.toString("ddMMyyyy"));
 
-    xml_data.replace(":SellerName", seller.name);
-    xml_data.replace(":CustomerName", customer.name);
-    xml_data.replace(":IPN", seller.ipn);
-    xml_data.replace(":c_IPN", customer.ipn);
+    xml_data.replace(":SellerName", seller.name.toHtmlEscaped());
+    xml_data.replace(":CustomerName", customer.name.toHtmlEscaped());
+    xml_data.replace(":IPN", seller.ipn.toHtmlEscaped());
+    xml_data.replace(":c_IPN", customer.ipn.toHtmlEscaped());
 
     xml_data.replace(":All_with_Pdv", QString::number(all_sum_with_pdv));
     xml_data.replace(":Pdv", QString::number(pdv));
@@ -81,18 +81,25 @@ void XmlDocumentLoader::generatePodatkovaNakladna(const Person& seller,
     xml_data.replace(":Data", data);
 
     // Formatting SellerName for sign
-    QStringList params { seller.name.split(
-        " ") }; // 1 - "ФОП", 2 - "Прізвище", 3 - "Ім'я", 4 - "По-батькові"
-    Q_ASSERT(params.size() == 4);
-    const QString& formattedName = QString(":N. :B. :P")
-                                       .arg(params.at(2).at(0), params.at(3).at(0), params.at(1));
-    xml_data.replace(":SellerFormattedName", formattedName);
+    const QStringList params = seller.name.split(" ", Qt::SkipEmptyParts);
+    QString formattedName = seller.name;
+    // Expected form: "ФОП Прізвище Ім'я По-батькові".
+    if (params.size() >= 4)
+        formattedName = QString("%1. %2. %3")
+                            .arg(params.at(2).at(0), params.at(3).at(0), params.at(1));
+    xml_data.replace(":SellerFormattedName", formattedName.toHtmlEscaped());
 
     // SAVE TO FILE
     const QString fileName = QFileDialog::getSaveFileName(
         nullptr, "Вигрузити файл", "/", ("Xml-files (*.xml)"));
+    if (fileName.isEmpty())
+        return;
+
     QFile result(fileName);
-    result.open(QIODevice::WriteOnly);
+    if (!result.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(nullptr, "Помилка", "Не вийшло зберегти XML-файл", QMessageBox::Ok);
+        return;
+    }
     QTextStream out(&result);
     out << xml_data;
 }
@@ -165,13 +172,11 @@ void XmlDocumentLoader::loadOmegaNakladnaToDB(const QString& fileName)
 
                                     for (auto &item : records)
                                     {
-                                        QString qry_str = "SELECT id FROM product WHERE %1='%2'";
-                                        if (!item.code.isEmpty())
-                                            qry_str = qry_str.arg("code", item.code);
-                                        else
-                                            qry_str = qry_str.arg("catalog", item.catalog);
-
-                                        qry.exec(qry_str);
+                                        const QString column = item.code.isEmpty() ? "catalog" : "code";
+                                        const QString value = item.code.isEmpty() ? item.catalog : item.code;
+                                        qry.prepare("SELECT id FROM product WHERE " + column + " = :value");
+                                        qry.bindValue(":value", value);
+                                        qry.exec();
 
                                         int product_id {};
                                         if (qry.next()) // if exists
@@ -209,14 +214,14 @@ void XmlDocumentLoader::loadOmegaNakladnaToDB(const QString& fileName)
 int XmlDocumentLoader::insertNewProduct(const Record& newProduct)
 {
     QSqlQuery qry;
-    QString qry_str { "INSERT INTO product(code, catalog, name, unit, "
-                      "purchase_price) VALUES('%1', '%2', '%3', '%4', '%5')" };
-    qry_str = qry_str.arg(newProduct.code,
-        newProduct.catalog,
-        newProduct.name,
-        newProduct.unit,
-        newProduct.purchase_price);
-    if (!qry.exec(qry_str)) {
+    qry.prepare("INSERT INTO product(code, catalog, name, unit, purchase_price) "
+                "VALUES(:code, :catalog, :name, :unit, :price)");
+    qry.bindValue(":code", newProduct.code);
+    qry.bindValue(":catalog", newProduct.catalog);
+    qry.bindValue(":name", newProduct.name);
+    qry.bindValue(":unit", newProduct.unit);
+    qry.bindValue(":price", newProduct.purchase_price);
+    if (!qry.exec()) {
         QMessageBox::critical(nullptr,
             "Помилка завантаження накладної #1",
             qry.lastError().text(),
@@ -224,11 +229,7 @@ int XmlDocumentLoader::insertNewProduct(const Record& newProduct)
         return -1;
     }
 
-    qry.exec("SELECT MAX(id) FROM product");
-    if (qry.next())
-        return qry.value(0).toInt();
-    else
-        return -1;
+    return qry.lastInsertId().toInt();
 }
 
 void XmlDocumentLoader::insertNewRecordToList(const int& list_id,
@@ -239,7 +240,9 @@ void XmlDocumentLoader::insertNewRecordToList(const int& list_id,
     QSqlQuery qry;
 
     // 1. Add new amount to DB
-    qry.exec("SELECT amount FROM product WHERE id=" + QString::number(product_id));
+    qry.prepare("SELECT amount FROM product WHERE id = :id");
+    qry.bindValue(":id", product_id);
+    qry.exec();
     if (!qry.next()) {
         QMessageBox::critical(nullptr,
             "Помилка завантаження накладної #2",
@@ -249,7 +252,10 @@ void XmlDocumentLoader::insertNewRecordToList(const int& list_id,
     }
     const int new_amount = qry.value(0).toInt() + count.toInt();
 
-    if (!qry.exec("UPDATE product SET amount=" + QString::number(new_amount) + " WHERE id=" + QString::number(product_id))) {
+    qry.prepare("UPDATE product SET amount = :amount WHERE id = :id");
+    qry.bindValue(":amount", new_amount);
+    qry.bindValue(":id", product_id);
+    if (!qry.exec()) {
         QMessageBox::critical(nullptr,
             "Помилка завантаження накладної #3",
             qry.lastError().text(),
@@ -258,11 +264,13 @@ void XmlDocumentLoader::insertNewRecordToList(const int& list_id,
     }
 
     // 2. Insert into record table
-    QString qry_str { "INSERT INTO record(count, product_id, list_id, price) "
-                      "VALUES('%1', '%2', '%3', '%4')" };
-    qry_str = qry_str.arg(
-        count, QString::number(product_id), QString::number(list_id), price);
-    if (!qry.exec(qry_str)) {
+    qry.prepare("INSERT INTO record(count, product_id, list_id, price) "
+                "VALUES(:count, :product_id, :list_id, :price)");
+    qry.bindValue(":count", count);
+    qry.bindValue(":product_id", product_id);
+    qry.bindValue(":list_id", list_id);
+    qry.bindValue(":price", price);
+    if (!qry.exec()) {
         QMessageBox::critical(nullptr,
             "Помилка завантаження накладної #4",
             qry.lastError().text(),
@@ -275,19 +283,23 @@ int XmlDocumentLoader::insertNewNakladnaWithSellerEDRPOY(const QString& EDRPOY)
 {
     QSqlQuery qry;
     int list_id {};
-    qry.exec("SELECT MAX(number) FROM list WHERE type='" + DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya] + "'");
+    qry.prepare("SELECT MAX(number) FROM list WHERE type = :type");
+    qry.bindValue(":type", DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya]);
+    qry.exec();
     if (qry.next())
     {
         const int newListNumber = qry.value(0).toInt() + 1;
-        qry.exec("SELECT id FROM seller WHERE edrpoy=" + EDRPOY);
-        if (qry.next() && qry.exec("INSERT INTO list(seller_id, number, type) VALUES('"
-                                   + qry.value(0).toString()
-                                   + "', "
-                                   + QString::number(newListNumber)
-                                   + ", 'Накладна на надходження')")) {
-            qry.exec("SELECT MAX(id) FROM list");
-            if (qry.next())
-                list_id = qry.value(0).toInt();
+        qry.prepare("SELECT id FROM seller WHERE edrpoy = :edrpoy");
+        qry.bindValue(":edrpoy", EDRPOY);
+        qry.exec();
+        if (qry.next()) {
+            const int sellerId = qry.value(0).toInt();
+            qry.prepare("INSERT INTO list(seller_id, number, type) VALUES(:seller_id, :number, :type)");
+            qry.bindValue(":seller_id", sellerId);
+            qry.bindValue(":number", newListNumber);
+            qry.bindValue(":type", DOC_TYPES_NAMES[DOC_TYPES::Nakladna_na_nadhodjennya]);
+            if (qry.exec())
+                list_id = qry.lastInsertId().toInt();
         }
     }
 

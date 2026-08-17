@@ -55,7 +55,9 @@ void FindProduct::on_btn_search_clicked()
 void FindProduct::searchForEqual(QString column, QString data)
 {
     QSqlQuery qry;
-    qry.exec("SELECT id FROM product WHERE " + column + "='" + data + "'");
+    qry.prepare("SELECT id FROM product WHERE " + column + " = :value");
+    qry.bindValue(":value", data);
+    qry.exec();
 
     while (qry.next())
         foundProductIDs.push_back(qry.value(0).toString());
@@ -64,7 +66,9 @@ void FindProduct::searchForEqual(QString column, QString data)
 void FindProduct::searchForSubstr(QString column, QString name)
 {
     QSqlQuery qry;
-    qry.exec("SELECT id FROM product WHERE " + column + " LIKE '%" + name + "%'");
+    qry.prepare("SELECT id FROM product WHERE " + column + " LIKE :value");
+    qry.bindValue(":value", "%" + name + "%");
+    qry.exec();
 
     while (qry.next())
         foundProductIDs.push_back(qry.value(0).toString());
@@ -74,4 +78,3 @@ const QStringList &FindProduct::getFoundProductIDs() const
 {
     return foundProductIDs;
 }
-

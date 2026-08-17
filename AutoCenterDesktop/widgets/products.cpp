@@ -63,10 +63,15 @@ Products::~Products()
 void Products::insertProductToDb(QString code, QString catalog, QString tnved, QString name, QString unit, QString price)
 {
     QSqlQuery qry;
-    QString query_str =
-            "INSERT INTO product(code, catalog, tnved, name, unit, purchase_price) "
-                "VALUES('%1', '%2', '%3', '%4', '%5', '%6')";
-    qry.exec(query_str.arg(code, catalog, tnved, name, unit, price));
+    qry.prepare("INSERT INTO product(code, catalog, tnved, name, unit, purchase_price) "
+                "VALUES(:code, :catalog, :tnved, :name, :unit, :price)");
+    qry.bindValue(":code", code);
+    qry.bindValue(":catalog", catalog);
+    qry.bindValue(":tnved", tnved);
+    qry.bindValue(":name", name);
+    qry.bindValue(":unit", unit);
+    qry.bindValue(":price", price);
+    qry.exec();
 }
 
 void Products::on_btn_add_clicked()
@@ -142,4 +147,3 @@ void Products::resizeEvent(QResizeEvent *event)
 
     QWidget::resizeEvent(event);
 }
-

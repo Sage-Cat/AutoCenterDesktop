@@ -38,15 +38,22 @@ void PricelistParserToDB::countApproximateNumberOfRecordsInFile()
 
     const qint64 fileSize = file.size();
     qint64 keyWordCount {}, symbols_count {};
-    while (keyWordCount < RECORDS_COUNT_TO_CHECK)
+    while (keyWordCount < RECORDS_COUNT_TO_CHECK && !stream.atEnd())
     {
         QString line = stream.readLine();
         symbols_count += line.size();
         if (line.contains("</Прайс>")) // means that one more record is checked
             keyWordCount++;
     }
-    const qint64 averageCountOfSymbolsPerRecord = symbols_count / RECORDS_COUNT_TO_CHECK;
-    approximateCountOfRecordsInFile = fileSize / averageCountOfSymbolsPerRecord;
+    if (keyWordCount == 0 || symbols_count == 0) {
+        approximateCountOfRecordsInFile = 0;
+        return;
+    }
+
+    const qint64 averageCountOfSymbolsPerRecord = symbols_count / keyWordCount;
+    approximateCountOfRecordsInFile = averageCountOfSymbolsPerRecord > 0
+        ? fileSize / averageCountOfSymbolsPerRecord
+        : 0;
 }
 
 void PricelistParserToDB::parseAsOmegaPriceList()
@@ -66,7 +73,7 @@ void PricelistParserToDB::parseAsOmegaPriceList()
     QXmlStreamReader reader(&file);
     int counter {}; // counter for records
     int progressBarValue {};
-    const int recordsForOnePercent = approximateCountOfRecordsInFile / 100;
+    const int recordsForOnePercent = qMax(1, approximateCountOfRecordsInFile / 100);
 
     int miss_count {}; // counter for errors
     while(reader.readNextStartElement() && miss_count < MAX_NUMBER_OF_MISSES)
