@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Qt
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes qt5-qmake qtbase5-dev libqt5sql5-sqlite
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          qmake ../AutoCenterDesktop/AutoCenterDesktop.pro
+          make --jobs="$(nproc)"
